@@ -1,4 +1,4 @@
-// lib/models/tablo_destek.dart
+// ignore_for_file: non_constant_identifier_names
 import 'package:flutter/material.dart';
 
 class Destek {
@@ -39,8 +39,8 @@ class Destek {
     required this.son_cevap,
     required this.son_tarih,
     required this.ip,
-    required this.durum,
-    this.cevap_yazan,
+    this.durum = 0,
+    this.cevap_yazan = 0,
     this.kisi,
     required this.mesaj,
     this.bilgiler,

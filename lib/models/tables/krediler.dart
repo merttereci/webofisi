@@ -1,17 +1,16 @@
-// lib/models/credit_transaction.dart
 import 'package:flutter/material.dart';
 
-class CreditTransaction {
+class Krediler {
   final int id;
-  final int uyeid; // 'uyeid'
-  final String tutar; // 'tutar'
-  final int paytronay; // 'paytronay'
-  final String spno; // 'spno'
-  final int bonus; // 'bonus'
-  final String ip; // 'ip'
-  final DateTime tarih; // 'tarih' - string'den parse edilecek
+  final int uyeid;
+  final String tutar;
+  final int paytronay;
+  final String spno;
+  final int bonus;
+  final String ip;
+  final DateTime tarih;
 
-  CreditTransaction({
+  Krediler({
     required this.id,
     required this.uyeid,
     required this.tutar,
@@ -22,7 +21,7 @@ class CreditTransaction {
     required this.tarih,
   });
 
-  factory CreditTransaction.fromJson(Map<String, dynamic> json) {
+  factory Krediler.fromJson(Map<String, dynamic> json) {
     DateTime? parseDateString(String? dateStr) {
       if (dateStr == null || dateStr.isEmpty) return null;
       try {
@@ -33,7 +32,7 @@ class CreditTransaction {
       }
     }
 
-    return CreditTransaction(
+    return Krediler(
       id: json['id'] as int,
       uyeid: json['uyeid'] as int,
       tutar: json['tutar'] as String,
