@@ -1,5 +1,4 @@
 // ignore_for_file: non_constant_identifier_names
-
 class TabloKategoriler {
   final int id;
   final String adi;

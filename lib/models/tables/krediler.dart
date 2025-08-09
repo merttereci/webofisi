@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Krediler {
+class TabloKrediler {
   final int id;
   final int uyeid;
   final String tutar;
@@ -10,7 +10,7 @@ class Krediler {
   final String ip;
   final DateTime tarih;
 
-  Krediler({
+  TabloKrediler({
     required this.id,
     required this.uyeid,
     required this.tutar,
@@ -21,7 +21,7 @@ class Krediler {
     required this.tarih,
   });
 
-  factory Krediler.fromJson(Map<String, dynamic> json) {
+  factory TabloKrediler.fromJson(Map<String, dynamic> json) {
     DateTime? parseDateString(String? dateStr) {
       if (dateStr == null || dateStr.isEmpty) return null;
       try {
@@ -32,7 +32,7 @@ class Krediler {
       }
     }
 
-    return Krediler(
+    return TabloKrediler(
       id: json['id'] as int,
       uyeid: json['uyeid'] as int,
       tutar: json['tutar'] as String,

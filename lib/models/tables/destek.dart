@@ -1,7 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:flutter/material.dart';
 
-class Destek {
+class TabloDestek {
   final int id;
   final int uye_id;
   final String isim;
@@ -25,7 +25,7 @@ class Destek {
   final String? islem_tarih;
   final DateTime? yapim_tarih;
 
-  Destek({
+  TabloDestek({
     required this.id,
     required this.uye_id,
     required this.isim,
@@ -50,7 +50,7 @@ class Destek {
     this.yapim_tarih,
   });
 
-  factory Destek.fromJson(Map<String, dynamic> json) {
+  factory TabloDestek.fromJson(Map<String, dynamic> json) {
     DateTime? parseDateString(dynamic date) {
       if (date == null || date.toString().isEmpty) return null;
       try {
@@ -61,7 +61,7 @@ class Destek {
       }
     }
 
-    return Destek(
+    return TabloDestek(
       id: json['id'] as int,
       uye_id: json['uye_id'] as int,
       isim: json['isim'] as String,
