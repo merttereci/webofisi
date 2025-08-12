@@ -269,6 +269,7 @@ class _AuthScreenState extends State<AuthScreen>
             fontWeight: FontWeight.bold,
             color: Color(0xFF2D3748),
           ),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
