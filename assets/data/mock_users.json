@@ -1,0 +1,52 @@
+[
+    {
+        "id": 1,
+        "ad": "Ali",
+        "soyad": "Yılmaz",
+        "email": "ali@example.com",
+        "sifre": "sifre123",
+        "telefon": "5551112233",
+        "durum": 1,
+        "statu": 1
+    },
+    {
+        "id": 2,
+        "ad": "Ayşe",
+        "soyad": "Demir",
+        "email": "ayse@example.com",
+        "sifre": "sifre456",
+        "telefon": "5554445566",
+        "durum": 1,
+        "statu": 1
+    },
+    {
+        "id": 3,
+        "ad": "Deniz",
+        "soyad": "Kaya",
+        "email": "deniz@example.com",
+        "sifre": "sifre789",
+        "telefon": "5557778899",
+        "durum": 0,
+        "statu": 0
+    },
+    {
+        "id": 4,
+        "ad": "Mert",
+        "soyad": "Tereci",
+        "email": "mert@gmail.com",
+        "sifre": "123456",
+        "telefon": "5557778899",
+        "durum": 0,
+        "statu": 0
+    },
+    {
+        "id": 5,
+        "ad": "İpek",
+        "soyad": "Tereci",
+        "email": "ipek@gmail.com",
+        "sifre": "12345678",
+        "telefon": "5557778899",
+        "durum": 0,
+        "statu": 0
+    }
+]

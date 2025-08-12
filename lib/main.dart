@@ -1,9 +1,8 @@
 // main.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:web_ofisi_mobile/screens/auth_screen.dart';
 import 'providers/product_provider.dart';
-import 'screens/product_list_screen.dart';
-import 'screens/home_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: HomeScreen(),
+        home: AuthScreen(),
       ),
     );
   }

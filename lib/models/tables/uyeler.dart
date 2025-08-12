@@ -33,7 +33,7 @@ class TabloUyeler {
   final String? ay;
   final String? ktarih;
   final int? parasutuyeid;
-  final int vatandas;
+  final int? vatandas; //normalde zorunlu ama default değer de istiyor
   final int? vip;
   final String? mnot;
   final String? ip;
@@ -72,7 +72,8 @@ class TabloUyeler {
     this.ay,
     this.ktarih,
     this.parasutuyeid = 0,
-    required this.vatandas, // 0 olması lazım ama aynı zamanda not nullable
+    this.vatandas =
+        0, //normalde required olması lazım ama varsaylan değer verilmiş 0
     this.vip = 0,
     this.mnot,
     this.ip,
@@ -113,7 +114,7 @@ class TabloUyeler {
       ay: json['ay'] as String?,
       ktarih: json['ktarih'] as String?,
       parasutuyeid: json['parasutuyeid'] as int?,
-      vatandas: json['vatandas'] as int,
+      vatandas: json['vatandas'] as int?,
       vip: json['vip'] as int?,
       mnot: json['mnot'] as String?,
       ip: json['ip'] as String?,

@@ -28,8 +28,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  flutter:
-    sdk: flutter
+  flutter:  
+    sdk: flutter 
   http: ^0.13.5
   xml: ^6.2.2
   provider: ^6.0.5
@@ -60,6 +60,12 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/data/mock_users.json
+    - assets/logo/logo.png
+   
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:
