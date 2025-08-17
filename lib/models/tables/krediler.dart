@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// ignore_for_file: non_constant_identifier_names
 class TabloKrediler {
   final int id;
   final int uyeid;

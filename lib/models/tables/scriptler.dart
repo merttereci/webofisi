@@ -19,16 +19,16 @@ class TabloScriptler {
   final String description;
   final int coksatanlar;
   final int durum;
-  final int? yeni_lisans;
-  final int? uc_nesil;
-  final int? dort_nesil;
-  final int? uzak_lisans;
+  final int? yeni_lisans; //default 0
+  final int? uc_nesil; //default 0
+  final int? dort_nesil; //default 0
+  final int? uzak_lisans; //default 0
   final String tarih;
   final int coksatan2;
   final String? raradi;
-  final int? sanal;
-  final int? vip;
-  final int genis;
+  final int? sanal; //default 1
+  final int? vip; //default 0
+  final int? genis; //default 0
 
   TabloScriptler(
       {required this.id,
@@ -59,7 +59,7 @@ class TabloScriptler {
       this.raradi,
       this.sanal = 1,
       this.vip = 0,
-      required this.genis // varsayılan 0 denmiş, ama aynı zamanda not nullable,
+      this.genis = 0 // varsayılan 0 denmiş, ama aynı zamanda not nullable,
       });
 
   factory TabloScriptler.fromJson(Map<String, dynamic> json) {
@@ -93,7 +93,7 @@ class TabloScriptler {
       raradi: json['raradi'] as String?,
       sanal: json['sanal'] as int?,
       vip: json['vip'] as int?,
-      genis: json['genis'] as int,
+      genis: json['genis'] as int?,
     );
   }
 }

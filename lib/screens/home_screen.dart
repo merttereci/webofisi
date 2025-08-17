@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:web_ofisi_mobile/widgets/product_card_v2.dart';
 import '../providers/product_provider.dart';
 import '../widgets/flash_card_widget.dart';
-import '../widgets/product_lists_widgets/product_card.dart';
 import '../widgets/product_lists_widgets/loading_widget.dart';
 import '../widgets/product_lists_widgets/error_widget.dart';
 import 'product_list_screen.dart'; // ProductListScreen'i import ettik

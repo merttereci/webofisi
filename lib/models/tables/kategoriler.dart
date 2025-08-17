@@ -8,7 +8,7 @@ class TabloKategoriler {
   final String description;
   final int durum;
   final int yazilim_kat;
-  final int? vip;
+  final int? vip; //default 0
   final String tarih;
 
   TabloKategoriler({

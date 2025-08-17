@@ -3,21 +3,21 @@ class TabloHostingSiparisler {
   final int? uyeid;
   final String? paketadi;
   final String? periyod;
-  final String? sunucu;
+  final String? sunucu; //default "0"
   final String? domain;
   final String? username;
   final String? baslangic;
   final String? yenileme;
   final String? bitis;
-  final int? durum;
+  final int? durum; //default 1
   final int? hdurum;
   final String? aciklama;
   final String? tarih;
   final String? mailtarih;
   final String? smstarih;
-  final int? mail;
+  final int? mail; //default 0
   final int? sms;
-  final int? paytronay;
+  final int? paytronay; //default 0
 
   TabloHostingSiparisler({
     required this.id,

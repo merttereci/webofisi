@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 class TabloBankaHesaplari {
   final int id;
   final String banka;

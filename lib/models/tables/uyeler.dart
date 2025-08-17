@@ -1,9 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 class TabloUyeler {
   final int id;
-  final int? fbid;
-  final int? hesap;
-  final int? vergi;
+  final int? fbid; //default 0
+  final int? hesap; //default 1
+  final int? vergi; //default 1
   final String? ad;
   final String? soyad;
   final String? email;
@@ -19,21 +19,22 @@ class TabloUyeler {
   final String? vergidairesi;
   final String? firma_tel;
   final String? firma_adres;
-  final int? kampanya_eposta;
-  final int? kampanya_sms;
+  final int? kampanya_eposta; //default 0
+  final int? kampanya_sms; //default 0
   final String? indirim;
-  final int? statu;
-  final int? durum;
-  final int? ceponay;
+  final int? statu; //default 0
+  final int? durum; //default 0
+  final int? ceponay; //default 0
   final String? cepkod;
-  final int? emailonay;
+  final int? emailonay; //default 0
   final String? emailkod;
   final String? son_giris;
   final String? tarih;
   final String? ay;
   final String? ktarih;
-  final int? parasutuyeid;
-  final int? vatandas; //normalde zorunlu ama default değer de istiyor
+  final int? parasutuyeid; //default 0
+  final int?
+      vatandas; //normalde zorunlu ama default değer de istiyor , default 0
   final int? vip;
   final String? mnot;
   final String? ip;

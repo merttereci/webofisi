@@ -15,8 +15,8 @@ class TabloDestek {
   final String son_cevap;
   final String son_tarih;
   final String ip;
-  final int? durum;
-  final int? cevap_yazan;
+  final int? durum; //default 0
+  final int? cevap_yazan; //default 0
   final String? kisi;
   final String mesaj;
   final String? bilgiler;

@@ -29,7 +29,7 @@ class TabloSiparisler {
   final String havale;
   final String domain;
   final String lisans;
-  final int? lisanstip;
+  final int? lisanstip; //default 0
   final String surum;
   final String mesaj;
   final int durum;
@@ -38,18 +38,18 @@ class TabloSiparisler {
   final String ktarih;
   final String tarih;
   final int kdv;
-  final int? vergi;
-  final int? vergioran;
-  final int? fatura;
+  final int? vergi; //default 1
+  final int? vergioran; //default 18
+  final int? fatura; //default 0
   final String? spno;
-  final int? paytronay;
+  final int? paytronay; //default 0
   final DateTime? indirmetarihi; /////
   final String? ftp;
-  final int? parasutuyeid;
+  final int? parasutuyeid; //default 0
   final String? parasut_invoice;
   final String? parasut_invoice_send;
-  final int? mailsend;
-  final int? yazilimmailsend;
+  final int? mailsend; //default 0
+  final int? yazilimmailsend; //default 0
 
   TabloSiparisler({
     required this.id,
