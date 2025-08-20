@@ -1,8 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import '../models/tables/uyeler.dart';
-import 'home_screen.dart';
+import '../providers/user_provider.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
@@ -32,10 +31,8 @@ class _AuthScreenState extends State<AuthScreen>
       TextEditingController();
 
   bool _isLogin = true;
-  bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  List<TabloUyeler> _mockUsers = [];
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -44,7 +41,6 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   void initState() {
     super.initState();
-    _loadMockUsers();
     _setupAnimations();
   }
 
@@ -76,45 +72,31 @@ class _AuthScreenState extends State<AuthScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _loginEmailController.dispose();
+    _loginPasswordController.dispose();
+    _registerNameController.dispose();
+    _registerSurnameController.dispose();
+    _registerEmailController.dispose();
+    _registerPhoneController.dispose();
+    _registerPasswordController.dispose();
+    _registerConfirmPasswordController.dispose();
     super.dispose();
-  }
-
-  Future<void> _loadMockUsers() async {
-    try {
-      final String jsonString =
-          await rootBundle.loadString('assets/data/mock_users.json');
-      final List<dynamic> jsonList = json.decode(jsonString);
-      setState(() {
-        _mockUsers =
-            jsonList.map((json) => TabloUyeler.fromJson(json)).toList();
-      });
-      print('Mock kullanıcılar başarıyla yüklendi: ${_mockUsers.length} adet');
-    } catch (e) {
-      print('Mock kullanıcıları yüklenirken hata oluştu: $e');
-    }
   }
 
   void _login() async {
     if (_loginFormKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
+      final userProvider = context.read<UserProvider>();
 
-      // Mock loading delay
-      await Future.delayed(const Duration(milliseconds: 800));
-
-      final user = _mockUsers.firstWhere(
-        (u) =>
-            u.email == _loginEmailController.text &&
-            u.sifre == _loginPasswordController.text,
-        orElse: () => TabloUyeler(id: -1, email: '', sifre: ''),
+      final success = await userProvider.login(
+        _loginEmailController.text,
+        _loginPasswordController.text,
       );
 
-      setState(() => _isLoading = false);
-
-      if (user.id != -1) {
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => HomeScreen()));
-        _showSnackBar('Giriş başarılı! Hoş geldiniz ${user.ad}!',
+      if (success) {
+        _showSnackBar(
+            'Giriş başarılı! Hoş geldiniz ${userProvider.userFullName}!',
             isError: false);
+        // Navigation AuthWrapper tarafından otomatik yapılacak
       } else {
         _showSnackBar('Geçersiz e-posta veya şifre.');
       }
@@ -123,42 +105,35 @@ class _AuthScreenState extends State<AuthScreen>
 
   void _register() async {
     if (_registerFormKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-
-      await Future.delayed(const Duration(milliseconds: 800));
-
-      if (_mockUsers
-          .any((user) => user.email == _registerEmailController.text)) {
-        setState(() => _isLoading = false);
-        _showSnackBar('Bu e-posta adresi zaten kullanılıyor.');
-        return;
-      }
-
+      // Şifre eşleşme kontrolü
       if (_registerPasswordController.text !=
           _registerConfirmPasswordController.text) {
-        setState(() => _isLoading = false);
         _showSnackBar('Şifreler eşleşmiyor.');
         return;
       }
 
       final newUser = TabloUyeler(
-        id: _mockUsers.length + 1,
+        id: 0, // ID AuthService tarafından atanacak
         ad: _registerNameController.text,
         soyad: _registerSurnameController.text,
         email: _registerEmailController.text,
         sifre: _registerPasswordController.text,
         telefon: _registerPhoneController.text,
-        statu: 1,
-        durum: 1,
+        statu: 0, // Yeni kullanıcı
+        durum: 1, // Aktif
       );
 
-      _mockUsers.add(newUser);
-      setState(() => _isLoading = false);
+      final userProvider = context.read<UserProvider>();
+      final result = await userProvider.register(newUser);
 
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomeScreen()));
-      _showSnackBar('Kayıt başarılı! Hoş geldiniz ${newUser.ad}!',
-          isError: false);
+      if (result['success']) {
+        _showSnackBar(
+            'Kayıt başarılı! Hoş geldiniz ${userProvider.userFullName}!',
+            isError: false);
+        // Navigation AuthWrapper tarafından otomatik yapılacak
+      } else {
+        _showSnackBar(result['message'] ?? 'Kayıt işlemi başarısız.');
+      }
     }
   }
 
@@ -324,7 +299,9 @@ class _AuthScreenState extends State<AuthScreen>
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                // Şifremi unuttum fonksiyonu
+                // Şifremi unuttum fonksiyonu - ileride implement edilebilir
+                _showSnackBar('Şifre sıfırlama özelliği henüz aktif değil.',
+                    isError: false);
               },
               child: Text(
                 'Şifremi Unuttum?',
@@ -485,49 +462,54 @@ class _AuthScreenState extends State<AuthScreen>
   }
 
   Widget _buildActionButton() {
-    return Container(
-      width: double.infinity,
-      height: 56,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF667eea).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : (_isLogin ? _login : _register),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        return Container(
+          width: double.infinity,
+          height: 56,
+          decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : Text(
-                _isLogin ? 'Giriş Yap' : 'Hesap Oluştur',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+            gradient: const LinearGradient(
+              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF667eea).withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-      ),
+            ],
+          ),
+          child: ElevatedButton(
+            onPressed:
+                userProvider.isLoading ? null : (_isLogin ? _login : _register),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: userProvider.isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(
+                    _isLogin ? 'Giriş Yap' : 'Hesap Oluştur',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+          ),
+        );
+      },
     );
   }
 
@@ -546,6 +528,8 @@ class _AuthScreenState extends State<AuthScreen>
           onPressed: () {
             setState(() {
               _isLogin = !_isLogin;
+              // Form değiştirirken controller'ları temizle
+              _clearFormFields();
             });
           },
           child: Text(
@@ -559,5 +543,16 @@ class _AuthScreenState extends State<AuthScreen>
         ),
       ],
     );
+  }
+
+  void _clearFormFields() {
+    _loginEmailController.clear();
+    _loginPasswordController.clear();
+    _registerNameController.clear();
+    _registerSurnameController.clear();
+    _registerEmailController.clear();
+    _registerPhoneController.clear();
+    _registerPasswordController.clear();
+    _registerConfirmPasswordController.clear();
   }
 }

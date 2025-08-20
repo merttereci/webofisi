@@ -34,11 +34,13 @@ class Product {
   });
 
   // XML'den Product objesi oluşturmak için factory constructor
+  //factory constructor sayesinde Product.fromXml() çağrıldığında
+  //önce XML okunur, işlenir, sonra nesne oluşturulur.
+
   factory Product.fromXml(XmlElement element) {
     // Güvenli text alma fonksiyonu
     String getElementText(String tagName) {
       final elements = element.findElements(tagName);
-      // ignore: deprecated_member_use
       return elements.isNotEmpty ? elements.first.text : '';
     }
 

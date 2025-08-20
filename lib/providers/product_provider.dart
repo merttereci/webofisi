@@ -4,16 +4,18 @@ import '../models/product.dart';
 import '../services/product_service.dart';
 
 class ProductProvider extends ChangeNotifier {
-  List<Product> _allProducts = [];
-  List<Product> _filteredProducts = [];
-  List<Product> _displayedProducts = [];
-  bool _isLoading = false;
-  String _errorMessage = '';
-  String _searchQuery = '';
-  String? _selectedCategory; // Seçili kategori String olarak kalır
+  List<Product> _allProducts = []; // Tüm ürünler (ham veri)
+  List<Product> _filteredProducts =
+      []; // Filtrelenmiş ürünler (arama/kategoriye göre)
+  List<Product> _displayedProducts =
+      []; // Sadece ekranda gösterilecek ürünler (sayfalama)
+  bool _isLoading = false; // Şu an ürünler yükleniyor mu?
+  String _errorMessage = ''; // Hata varsa mesaj burada
+  String _searchQuery = ''; // Kullanıcının yazdığı arama metni
+  String? _selectedCategory; // Seçili kategori (yoksa null)
 
-  static const int _itemsPerPage = 8;
-  int _currentPage = 0;
+  static const int _itemsPerPage = 8; // Her sayfada 8 ürün göster
+  int _currentPage = 0; // O anki sayfa numarası
 
   // Getters
   List<Product> get allProducts => _allProducts;

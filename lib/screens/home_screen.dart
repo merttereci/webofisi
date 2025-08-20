@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web_ofisi_mobile/widgets/product_card_v2.dart';
 import '../providers/product_provider.dart';
+import '../providers/user_provider.dart';
 import '../widgets/flash_card_widget.dart';
 import '../widgets/product_lists_widgets/loading_widget.dart';
 import '../widgets/product_lists_widgets/error_widget.dart';
-import 'product_list_screen.dart'; // ProductListScreen'i import ettik
+import 'product_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Ürünleri yükle, böylece öne çıkan ürünleri gösterebiliriz
+    // ürünleri yükle, böylece öne çıkan ürünleri gösterebiliriz
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProductProvider>().loadProducts();
     });
@@ -29,15 +30,143 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
+      // appbar eklendi - kullanıcı bilgileri ile
+      appBar: AppBar(
+        title: const Text(
+          'Web Ofisi',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.grey[800],
+        elevation: 2,
+        shadowColor: Colors.black.withOpacity(0.1),
+        // kullanıcı bilgileri sağ tarafta
+        actions: [
+          Consumer<UserProvider>(
+            builder: (context, userProvider, child) {
+              if (!userProvider.isLoggedIn) {
+                // giriş yapılmamışsa boş döndür
+                return const SizedBox.shrink();
+              }
+
+              return Padding(
+                padding: const EdgeInsets.only(right: 16, top: 8, bottom: 8),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.blue[200]!, width: 1),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // kullanıcı avatarı
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundColor: Colors.blue[600],
+                        child: Text(
+                          userProvider.userInitials, // "DK" gibi
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      // kullanıcı adı
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Hoş geldin,',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey[600],
+                              height: 1,
+                            ),
+                          ),
+                          Text(
+                            userProvider.userFullName, // "Demo Kullanıcı"
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[800],
+                              height: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 8),
+                      // çıkış butonu
+                      InkWell(
+                        onTap: () async {
+                          // çıkış onayı
+                          final shouldLogout = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Çıkış Yap'),
+                              content: const Text(
+                                  'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(false),
+                                  child: const Text('İptal'),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(true),
+                                  child: const Text('Çıkış Yap'),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (shouldLogout == true) {
+                            await userProvider.logout();
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Başarıyla çıkış yapıldı.'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.logout,
+                            size: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
-        // Çentik ve durum çubuğu alanlarını hesaba kat
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 24), // Üst boşluk
+              const SizedBox(height: 24),
 
-              // Başlık
+              // başlık
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Text(
@@ -61,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Flash Kartlar Bölümü
+              // flash kartlar bölümü
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Text(
@@ -75,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 16),
               SizedBox(
-                height: 180, // Flash kartların yüksekliği
+                height: 180,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -106,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Öne Çıkan Ürünler Bölümü
+              // öne çıkan ürünler bölümü
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Text(
@@ -145,21 +274,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   } else {
-                    // İlk 5 ürünü göster (örnek olarak)
+                    // ilk 5 ürünü göster
                     final featuredProducts =
                         productProvider.allProducts.take(5).toList();
 
                     return SizedBox(
-                      height:
-                          300, // Ürün kartlarının yüksekliğine göre ayarlandı
+                      height: 300,
                       child: ListView.builder(
-                        scrollDirection: Axis.horizontal, // Yatay kaydırma
+                        scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.symmetric(horizontal: 24.0),
                         itemCount: featuredProducts.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: const EdgeInsets.only(
-                                right: 16.0), // Kartlar arası boşluk
+                            padding: const EdgeInsets.only(right: 16.0),
                             child: SizedBox(
                               width: 320,
                               child: ProductCardV2(
@@ -174,7 +301,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Tümünü Göster Butonu
+              // tümünü göster butonu
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: SizedBox(
@@ -204,7 +331,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 30), // Alt boşluk
+              const SizedBox(height: 30),
             ],
           ),
         ),
