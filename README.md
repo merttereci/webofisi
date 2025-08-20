@@ -1,66 +1,16 @@
-# 📱 Flutter Mobil Uygulama - Proje Yapısı
+# web_ofisi_mobile
 
-## 📁 Dizin Yapısı
+A new Flutter project.
 
-```
-lib/
-├── main.dart                           # Ana uygulama dosyası
-├── models/                             # Veri modelleri
-│   ├── tables/                         # Veritabanı tablo modelleri
-│   │   ├── banka_hesaplari.dart       # Banka hesapları modeli
-│   │   ├── destek_cevaplar.dart       # Destek cevapları modeli
-│   │   ├── destek.dart                # Destek modeli
-│   │   ├── hosting_siparis.dart       # Hosting siparişleri modeli
-│   │   ├── indirim_kuponlari.dart     # İndirim kuponları modeli
-│   │   ├── kategoriler.dart           # Kategoriler modeli
-│   │   ├── krediler.dart              # Krediler modeli
-│   │   ├── scriptler.dart             # Scriptler modeli
-│   │   ├── siparisler.dart            # Siparişler modeli
-│   │   ├── slider.dart                # Slider modeli
-│   │   └── uyeler.dart                # Üyeler modeli
-│   └── product.dart                    # Ana ürün modeli
-├── providers/                          # State Management (Provider)
-│   ├── product_provider.dart          # Ürün state yönetimi
-│   └── user_provider.dart             # Kullanıcı state yönetimi
-├── screens/                           # Uygulama ekranları
-│   ├── auth_screen.dart               # Kimlik doğrulama ekranı
-│   ├── home_screen.dart               # Ana sayfa ekranı
-│   ├── product_detail_screen.dart     # Ürün detay ekranı
-│   └── product_list_screen.dart       # Ürün listesi ekranı
-├── services/                          # API ve servis katmanı
-│   ├── auth_service.dart              # Kimlik doğrulama servisi
-│   └── product_service.dart           # Ürün API servisi
-└── widgets/                           # Özel widget bileşenleri
-    ├── product_details_widgets/       # Ürün detay widget'ları
-    │   ├── product_demo_buttons.dart  # Demo butonları
-    │   ├── product_description_section.dart # Açıklama bölümü
-    │   ├── product_detail_row.dart    # Detay satırları
-    │   └── product_image_gallery.dart # Görsel galerisi
-    └── product_lists_widgets/         # Ürün listesi widget'ları
-        ├── error_widget.dart          # Hata widget'ı
-        ├── loading_widget.dart        # Yükleme widget'ı
-        ├── pagination_widget.dart     # Sayfalama widget'ı
-        ├── product_card.dart          # Ürün kartı
-        ├── search_bar_widget.dart     # Arama çubuğu
-        ├── total_and_categories_widget.dart # Toplam ve kategori widget'ı
-        ├── flash_card_widget.dart     # Flash kart widget'ı
-        └── product_card_v2.dart       # Ürün kartı v2
-```
+## Getting Started
 
-## 🏗️ Mimari Yapı
+This project is a starting point for a Flutter application.
 
-- **MVVM (Model-View-ViewModel)** mimarisi
-- **Provider** state management çözümü
-- **Service katmanı** ile API bağlantıları
-- **Widget tabanlı** modüler tasarım
-- **Clean Architecture** prensipleri
+A few resources to get you started if this is your first Flutter project:
 
-## 🚀 Özellikler
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-- ✅ Kullanıcı kimlik doğrulama
-- ✅ Ürün listesi ve detay sayfaları
-- ✅ Arama ve filtreleme
-- ✅ Sayfalama (Pagination)
-- ✅ Responsive tasarım
-- ✅ State management
-- ✅ API entegrasyonu
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
