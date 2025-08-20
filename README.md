@@ -1,16 +1,46 @@
-# web_ofisi_mobile
+#  WEB OFİSİ MOBİLE
 
-A new Flutter project.
+...
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+📁 lib/
+├── 📄 main.dart
+├── 📁 models/
+│   ├── 📁 tables/
+│   │   ├── 📄 banka_hesaplari.dart
+│   │   ├── 📄 destek_cevaplar.dart
+│   │   ├── 📄 destek.dart
+│   │   ├── 📄 hosting_sipariş.dart
+│   │   ├── 📄 indirim_kuponlari.dart
+│   │   ├── 📄 kategoriler.dart
+│   │   ├── 📄 krediler.dart
+│   │   ├── 📄 scriptler.dart
+│   │   ├── 📄 siparisler.dart
+│   │   ├── 📄 slider.dart
+│   │   └── 📄 uyeler.dart
+│   └── 📄 product.dart
+├── 📁 providers/
+│   ├── 📄 product_provider.dart
+│   └── 📄 user_provider.dart
+├── 📁 screens/
+│   ├── 📄 auth_screen.dart
+│   ├── 📄 home_screen.dart
+│   ├── 📄 product_detail_screen.dart
+│   └── 📄 product_list_screen.dart
+├── 📁 services/
+│   ├── 📄 auth_service.dart
+│   └── 📄 product_service.dart
+└── 📁 widgets/
+    ├── 📁 product_details_widgets/
+    │   ├── 📄 product_demo_buttons.dart
+    │   ├── 📄 product_description_section.dart
+    │   ├── 📄 product_detail_row.dart
+    │   └── 📄 product_image_gallery.dart
+    └── 📁 product_lists_widgets/
+        ├── 📄 error_widget.dart
+        ├── 📄 loading_widget.dart
+        ├── 📄 pagination_widget.dart
+        ├── 📄 product_card.dart
+        ├── 📄 search_bar_widget.dart
+        ├── 📄 total_and_categories_widget.dart
+        ├── 📄 flash_card_widget.dart
+        └── 📄 product_card_v2.dart
