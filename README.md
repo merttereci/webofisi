@@ -1,6 +1,6 @@
-# 📱 Flutter Mobil Uygulama - Proje Yapısı
+#  Flutter Mobil Uygulama - Proje Yapısı
 
-## 📁 Dizin Yapısı
+## Dizin Yapısı
 
 ```
 lib/
@@ -23,21 +23,32 @@ lib/
 │   ├── product_provider.dart          # Ürün state yönetimi
 │   └── user_provider.dart             # Kullanıcı state yönetimi
 ├── screens/                           # Uygulama ekranları
+|   ├── tabs/  
+|       ├── cart_tab.dart
+|       ├── home_tab.dart
+|       ├── products_tab.dart
+|       └── profile_tab.dart        
 │   ├── auth_screen.dart               # Kimlik doğrulama ekranı
 │   ├── home_screen.dart               # Ana sayfa ekranı
-│   ├── product_detail_screen.dart     # Ürün detay ekranı
-│   └── product_list_screen.dart       # Ürün listesi ekranı
+│   ├── cart_screen.dart    
+│   ├── main_screen.dart     
+│   ├── profile_screen.dart
+│   ├── product_list_screen.dart       # Ürün listesi ekranı
+│   └── product_detail_screen.dart     # Ürün detay ekranı
 ├── services/                          # API ve servis katmanı
 │   ├── auth_service.dart              # Kimlik doğrulama servisi
 │   └── product_service.dart           # Ürün API servisi
 └── widgets/                           # Özel widget bileşenleri
-    ├── product_details_widgets/       # Ürün detay widget'ları
+    ├── flash_card_widget.dart      
+    ├── product_card_v2.dart
+    ├── product_details_widgets/        # Ürün detay widget'ları
     │   ├── product_demo_buttons.dart  # Demo butonları
     │   ├── product_description_section.dart # Açıklama bölümü
     │   ├── product_detail_row.dart    # Detay satırları
     │   └── product_image_gallery.dart # Görsel galerisi
     └── product_lists_widgets/         # Ürün listesi widget'ları
         ├── error_widget.dart          # Hata widget'ı
+        ├── category_selector_modal.dart        
         ├── loading_widget.dart        # Yükleme widget'ı
         ├── pagination_widget.dart     # Sayfalama widget'ı
         ├── product_card.dart          # Ürün kartı
@@ -47,7 +58,7 @@ lib/
         └── product_card_v2.dart       # Ürün kartı v2
 ```
 
-## 🏗️ Mimari Yapı
+## Mimari Yapı
 
 - **MVVM (Model-View-ViewModel)** mimarisi
 - **Provider** state management çözümü
@@ -55,12 +66,12 @@ lib/
 - **Widget tabanlı** modüler tasarım
 - **Clean Architecture** prensipleri
 
-## 🚀 Özellikler
+## Özellikler
 
-- ✅ Kullanıcı kimlik doğrulama
-- ✅ Ürün listesi ve detay sayfaları
-- ✅ Arama ve filtreleme
-- ✅ Sayfalama (Pagination)
-- ✅ Responsive tasarım
-- ✅ State management
-- ✅ API entegrasyonu
+-  Kullanıcı kimlik doğrulama
+-  Ürün listesi ve detay sayfaları
+-  Arama ve filtreleme
+-  Sayfalama (Pagination)
+-  Responsive tasarım
+-  State management
+-  API entegrasyonu
