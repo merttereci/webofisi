@@ -1,39 +1,25 @@
 // lib/widgets/total_and_categories_widget.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/product_provider.dart'; // ProductProvider'ı import etmeyi unutmayın
+import '../../providers/product_provider.dart';
 
 class TotalAndCategoriesWidget extends StatelessWidget {
-  const TotalAndCategoriesWidget({Key? key}) : super(key: key);
+  final VoidCallback? onShowCategoryModal; // callback eklendi
+
+  const TotalAndCategoriesWidget({Key? key, this.onShowCategoryModal})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // ProductProvider'a erişmek için Consumer kullanın
     return Consumer<ProductProvider>(
       builder: (context, provider, child) {
-        // DropdownMenuItems için kategori listesini hazırla
-        List<DropdownMenuItem<String>> dropdownItems = [
-          DropdownMenuItem(
-            value: 'Tümü', // Tüm kategorileri göster seçeneği
-            child: Text('Tüm Kategoriler'),
-          ),
-        ];
-
-        dropdownItems.addAll(
-          provider.availableCategories.map((category) {
-            return DropdownMenuItem(
-              value: category,
-              child: Text(category),
-            );
-          }).toList(),
-        );
-
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           color: Colors.white,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // sol taraf - ürün sayısı
               Text(
                 '${provider.filteredProducts.length} ürün bulundu',
                 style: TextStyle(
@@ -42,27 +28,55 @@ class TotalAndCategoriesWidget extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              Expanded(
-                // Dropdown'un sağa yayılmasını sağlar
-                child: Align(
-                  // Sağda hizalama için
-                  alignment: Alignment.centerRight,
-                  child: DropdownButton<String>(
-                    value: provider.selectedCategory, // Seçili kategori
-                    hint: const Text('Kategori Seç'),
-                    icon: const Icon(Icons.arrow_drop_down),
-                    iconSize: 24,
-                    elevation: 16,
-                    style: const TextStyle(color: Colors.deepPurple),
-                    underline: Container(
-                      height: 2,
-                      color: Colors.deepPurpleAccent,
+
+              // sağ taraf - sadece modal butonu
+              GestureDetector(
+                onTap: () => _showCategoryModal(context),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: provider.selectedCategory != null
+                        ? const Color(0xFF667eea).withOpacity(0.1)
+                        : Colors.grey[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: provider.selectedCategory != null
+                          ? const Color(0xFF667eea)
+                          : Colors.grey[300]!,
+                      width: 1,
                     ),
-                    onChanged: (String? newValue) {
-                      // ProductProvider'daki kategori seçme metodunu çağır
-                      context.read<ProductProvider>().selectCategory(newValue);
-                    },
-                    items: dropdownItems, // Hazırladığımız item listesi
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.tune,
+                        size: 16,
+                        color: provider.selectedCategory != null
+                            ? const Color(0xFF667eea)
+                            : Colors.grey[600],
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        provider.selectedCategory ?? 'Kategori',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: provider.selectedCategory != null
+                              ? const Color(0xFF667eea)
+                              : Colors.grey[700],
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 16,
+                        color: provider.selectedCategory != null
+                            ? const Color(0xFF667eea)
+                            : Colors.grey[600],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -71,5 +85,23 @@ class TotalAndCategoriesWidget extends StatelessWidget {
         );
       },
     );
+  }
+
+  // modal göster - callback kullan
+  void _showCategoryModal(BuildContext context) {
+    if (onShowCategoryModal != null) {
+      onShowCategoryModal!(); // mainscreen'den modal aç
+    } else {
+      // fallback: local modal aç (eski yöntem)
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => Container(
+          padding: EdgeInsets.all(20),
+          child: Text('Modal callback çalışmıyor'),
+        ),
+      );
+    }
   }
 }

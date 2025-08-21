@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web_ofisi_mobile/screens/auth_screen.dart';
-import 'package:web_ofisi_mobile/screens/home_screen.dart';
+import 'package:web_ofisi_mobile/screens/main_screen.dart';
 import 'providers/product_provider.dart';
 import 'providers/user_provider.dart';
 
@@ -60,7 +60,7 @@ class AuthWrapper extends StatelessWidget {
 
         // Giriş yapmış mı kontrolü
         if (userProvider.isLoggedIn) {
-          return const HomeScreen();
+          return const MainScreen();
         } else {
           return const AuthScreen();
         }

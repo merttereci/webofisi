@@ -10,37 +10,42 @@ import '../widgets/product_lists_widgets/loading_widget.dart';
 import '../widgets/product_lists_widgets/error_widget.dart';
 
 class ProductListScreen extends StatefulWidget {
+  final VoidCallback? onShowCategoryModal; // callback eklendi
+
+  const ProductListScreen({Key? key, this.onShowCategoryModal})
+      : super(key: key);
+
   @override
   _ProductListScreenState createState() => _ProductListScreenState();
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
-  // YENİ EKLENDİ: ScrollController tanımı
+  // scroll controller tanımı
   final ScrollController _scrollController = ScrollController();
 
-  // YENİ EKLENDİ: ProductProvider'ı dinlemek için değişken
+  // product provider'ı dinlemek için değişken
   late ProductProvider _productProvider;
 
   @override
   void initState() {
     super.initState();
-    // YENİ EKLENDİ: _productProvider'ı başlat
+    // product provider'ı başlat
     _productProvider = context.read<ProductProvider>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _productProvider.loadProducts();
     });
-    // YENİ EKLENDİ: ProductProvider'daki değişiklikleri dinlemek için listener ekle
+    // product provider'daki değişiklikleri dinlemek için listener ekle
     _productProvider.addListener(_scrollToTopOnStateChange);
   }
 
-  // YENİ EKLENDİ: ProductProvider değiştiğinde çağrılacak metod
+  // product provider değiştiğinde çağrılacak metod
   void _scrollToTopOnStateChange() {
-    // Eğer kaydırma kontrolcüsü bağlıysa ve en üstte değilse, en üste kaydır
+    // eğer kaydırma kontrolcüsü bağlıysa ve en üstte değilse, en üste kaydır
     if (_scrollController.hasClients && _scrollController.offset != 0.0) {
       _scrollController.animateTo(
-        0.0, // En üste kaydır
-        duration: const Duration(milliseconds: 300), // Hafif bir animasyonla
+        0.0, // en üste kaydır
+        duration: const Duration(milliseconds: 300), // hafif bir animasyonla
         curve: Curves.easeOut,
       );
     }
@@ -48,7 +53,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   @override
   void dispose() {
-    // YENİ EKLENDİ: Controller ve Listener'ı dispose etmeyi unutmayın
+    // controller ve listener'ı dispose etmeyi unutmayın
     _scrollController.dispose();
     _productProvider.removeListener(_scrollToTopOnStateChange);
     super.dispose();
@@ -74,10 +79,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
         builder: (context, productProvider, child) {
           return Column(
             children: [
-              // Arama çubuğu (KONUMU AYNI)
+              // arama çubuğu
               SearchBarWidget(),
 
-              // İçerik
+              // içerik
               Expanded(
                 child: productProvider.isLoading
                     ? LoadingWidget()
@@ -94,14 +99,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
                               )
                             : Column(
                                 children: [
-                                  // Sonuç sayısı (KONUMU AYNI: Expanded içindeki Column'ın ilk elemanı)
-                                  TotalAndCategoriesWidget(),
+                                  // sonuç sayısı ve kategori seçici - callback geçildi
+                                  TotalAndCategoriesWidget(
+                                    onShowCategoryModal:
+                                        widget.onShowCategoryModal,
+                                  ),
 
-                                  // Ürün kartları
+                                  // ürün kartları
                                   Expanded(
                                     child: ListView.builder(
-                                      // LİSTVIEW BURADA BIRAKILDI
-                                      // YENİ EKLENDİ: ScrollController'ı ListView'e ata
+                                      // scroll controller'ı listview'e ata
                                       controller: _scrollController,
                                       padding: EdgeInsets.all(16.0),
                                       itemCount: productProvider
@@ -115,7 +122,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                     ),
                                   ),
 
-                                  // Pagination kontrolleri
+                                  // pagination kontrolleri
                                   PaginationWidget(),
                                 ],
                               ),

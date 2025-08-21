@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web_ofisi_mobile/widgets/product_card_v2.dart';
 import '../providers/product_provider.dart';
-import '../providers/user_provider.dart';
+import '../providers/user_provider.dart'; // user provider import eklendi
 import '../widgets/flash_card_widget.dart';
 import '../widgets/product_lists_widgets/loading_widget.dart';
 import '../widgets/product_lists_widgets/error_widget.dart';
-import 'product_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final Function(int)? onTabChange; // callback eklendi
+
+  const HomeScreen({Key? key, this.onTabChange}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -20,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // ürünleri yükle, böylece öne çıkan ürünleri gösterebiliriz
+    // ürünleri yükle
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProductProvider>().loadProducts();
     });
@@ -30,310 +31,271 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      // appbar eklendi - kullanıcı bilgileri ile
+      // yeni minimal appbar - sadece logo
       appBar: AppBar(
-        title: const Text(
-          'Web Ofisi',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.grey[800],
-        elevation: 2,
+        backgroundColor: Colors.grey[50],
+        elevation: 1,
         shadowColor: Colors.black.withOpacity(0.1),
-        // kullanıcı bilgileri sağ tarafta
-        actions: [
-          Consumer<UserProvider>(
-            builder: (context, userProvider, child) {
-              if (!userProvider.isLoggedIn) {
-                // giriş yapılmamışsa boş döndür
-                return const SizedBox.shrink();
-              }
-
-              return Padding(
-                padding: const EdgeInsets.only(right: 16, top: 8, bottom: 8),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.blue[200]!, width: 1),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // kullanıcı avatarı
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: Colors.blue[600],
-                        child: Text(
-                          userProvider.userInitials, // "DK" gibi
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // kullanıcı adı
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Hoş geldin,',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.grey[600],
-                              height: 1,
-                            ),
-                          ),
-                          Text(
-                            userProvider.userFullName, // "Demo Kullanıcı"
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey[800],
-                              height: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 8),
-                      // çıkış butonu
-                      InkWell(
-                        onTap: () async {
-                          // çıkış onayı
-                          final shouldLogout = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Çıkış Yap'),
-                              content: const Text(
-                                  'Hesabınızdan çıkış yapmak istediğinizden emin misiniz?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(false),
-                                  child: const Text('İptal'),
-                                ),
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(true),
-                                  child: const Text('Çıkış Yap'),
-                                ),
-                              ],
-                            ),
-                          );
-
-                          if (shouldLogout == true) {
-                            await userProvider.logout();
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Başarıyla çıkış yapıldı.'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                            }
-                          }
-                        },
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Icon(
-                            Icons.logout,
-                            size: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+        centerTitle: true,
+        automaticallyImplyLeading: false, // geri butonunu gizle
+        title: Container(
+          height: 40, // logo yüksekliği
+          child: Image.asset(
+            'assets/logo/logo.png',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              // logo yüklenemezse fallback text
+              return const Text(
+                'Web Ofisi',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Color(0xFF667eea),
                 ),
               );
             },
           ),
-        ],
+        ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 24),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 32), // üst boşluk artırıldı
 
-              // başlık
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Text(
-                  'Web Ofisi',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[750],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Text(
-                  'Dijital Çözümleriniz Burada Başlar',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // flash kartlar bölümü
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Text(
-                  'Öne Çıkan Hizmetler',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 180,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  children: [
-                    FlashCardWidget(
-                      title: 'Güvenli Hazır Site Çözümleri',
-                      description:
-                          'Gizliliğiniz ve güvenliğiniz bizim için çok önemlidir. Ucuz web sitesi hizmetlerimizle güvenilir ve kaliteli hizmet sunuyoruz.',
-                      backgroundColor: Colors.blue[600]!,
-                      icon: Icons.web,
-                    ),
-                    FlashCardWidget(
-                      title: 'Profesyonel Hazır Web Sitesi Ekibi',
-                      description:
-                          'Deneyimli ve yetenekli ekibimiz, hazır site projelerinizde sizlere yardımcı olmak için çalışmaktadır.',
-                      backgroundColor: Colors.green[600]!,
-                      icon: Icons.shopping_cart,
-                    ),
-                    FlashCardWidget(
-                      title: 'Ekonomik Web Sitesi ve Memnuniyet',
-                      description:
-                          'Ucuz web sitesi paketlerimizle müşteri memnuniyetini ön planda tutarak, binlerce mutlu müşteriye ulaştık.',
-                      backgroundColor: Colors.orange[600]!,
-                      icon: Icons.trending_up,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-
-              // öne çıkan ürünler bölümü
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Text(
-                  'Popüler Ürünlerimiz',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[800],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Consumer<ProductProvider>(
-                builder: (context, productProvider, child) {
-                  if (productProvider.isLoading) {
-                    return Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: LoadingWidget(),
-                    );
-                  } else if (productProvider.errorMessage.isNotEmpty) {
-                    return Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Error1Widget(
-                        message: productProvider.errorMessage,
-                        onRetry: () => productProvider.loadProducts(),
-                      ),
-                    );
-                  } else if (productProvider.allProducts.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: Center(
-                        child: Text(
-                          'Gösterilecek ürün bulunamadı.',
-                          style: TextStyle(color: Colors.grey, fontSize: 16),
+            // hoş geldin bölümü - kullanıcı ismi ile kişiselleştirildi
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Consumer<UserProvider>(
+                builder: (context, userProvider, child) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        userProvider.isLoggedIn
+                            ? 'Merhaba ${userProvider.currentUser?.ad ?? ""}! '
+                            : 'Merhaba!',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
                         ),
                       ),
-                    );
-                  } else {
-                    // ilk 5 ürünü göster
-                    final featuredProducts =
-                        productProvider.allProducts.take(5).toList();
-
-                    return SizedBox(
-                      height: 300,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        itemCount: featuredProducts.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 16.0),
-                            child: SizedBox(
-                              width: 320,
-                              child: ProductCardV2(
-                                  product: featuredProducts[index]),
-                            ),
-                          );
-                        },
+                      const SizedBox(height: 8),
+                      Text(
+                        userProvider.isLoggedIn
+                            ? 'İhtiyacınıza uygun hazır yazılımları keşfedin'
+                            : 'Projelerinizi keşfetmeye başlayın!',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                          height: 1.4,
+                        ),
                       ),
-                    );
-                  }
+                    ],
+                  );
                 },
               ),
-              const SizedBox(height: 24),
+            ),
+            const SizedBox(height: 32), // flash kartlarla arası
 
-              // tümünü göster butonu
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProductListScreen()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[700],
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 4,
-                    ),
-                    child: const Text(
-                      'Tüm Ürünleri Göster',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            // öne çıkan hizmetler - başlık iyileştirildi
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF667eea),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Öne Çıkan Hizmetlerimiz',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 30),
-            ],
-          ),
+            ),
+            const SizedBox(height: 20), // boşluk artırıldı
+
+            // flash kartlar - yükseklik artırıldı
+            SizedBox(
+              height: 200, // 180'den 200'e çıktı
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                children: [
+                  FlashCardWidget(
+                    title: 'Güvenli Hazır Site Çözümleri',
+                    description:
+                        'Gizliliğiniz ve güvenliğiniz bizim için çok önemlidir. Ucuz web sitesi hizmetlerimizle güvenilir ve kaliteli hizmet sunuyoruz.',
+                    backgroundColor: Colors.blue[600]!,
+                    icon: Icons.security,
+                  ),
+                  FlashCardWidget(
+                    title: 'Profesyonel Geliştirici Ekibi',
+                    description:
+                        'Deneyimli ve yetenekli ekibimiz, projelerinizde sizlere 7/24 destek sağlamaya hazır.',
+                    backgroundColor: Colors.green[600]!,
+                    icon: Icons.code,
+                  ),
+                  FlashCardWidget(
+                    title: 'Ekonomik ve Kaliteli Çözümler',
+                    description:
+                        'Uygun fiyatlı paketlerimizle müşteri memnuniyetini ön planda tutarak, binlerce mutlu müşteriye ulaştık.',
+                    backgroundColor: Colors.orange[600]!,
+                    icon: Icons.trending_up,
+                  ),
+                  // yeni 4. kart eklendi
+                  FlashCardWidget(
+                    title: 'Hızlı Teslimat Garantisi',
+                    description:
+                        'Projelerinizi zamanında ve kaliteli bir şekilde teslim etme garantisi veriyoruz.',
+                    backgroundColor: Colors.purple[600]!,
+                    icon: Icons.flash_on,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40), // boşluk artırıldı
+
+            // popüler ürünler - başlık iyileştirildi
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF667eea),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Popüler Ürünlerimiz',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ],
+                  ),
+                  // "tümünü gör" text butonu - otomatik tab geçiş
+                  TextButton(
+                    onPressed: () {
+                      // callback ile ürünler tab'ına geç (index 1)
+                      if (widget.onTabChange != null) {
+                        widget.onTabChange!(1);
+                      }
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Tümünü Gör',
+                          style: TextStyle(
+                            color: const Color(0xFF667eea),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 12,
+                          color: const Color(0xFF667eea),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // ürün listesi
+            Consumer<ProductProvider>(
+              builder: (context, productProvider, child) {
+                if (productProvider.isLoading) {
+                  return Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: LoadingWidget(),
+                  );
+                } else if (productProvider.errorMessage.isNotEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Error1Widget(
+                      message: productProvider.errorMessage,
+                      onRetry: () => productProvider.loadProducts(),
+                    ),
+                  );
+                } else if (productProvider.allProducts.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.inventory_2_outlined,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Henüz ürün yüklenmedi',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                } else {
+                  // ilk 6 ürünü göster (5'ten 6'ya çıktı)
+                  final featuredProducts =
+                      productProvider.allProducts.take(6).toList();
+
+                  return SizedBox(
+                    height: 300,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      itemCount: featuredProducts.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: SizedBox(
+                            width: 300, // 320'den 300'e düştü - daha kompakt
+                            child:
+                                ProductCardV2(product: featuredProducts[index]),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+              },
+            ),
+
+            // alt boşluk - floating navbar için
+            const SizedBox(height: 100), // 30'dan 100'e çıktı
+          ],
         ),
       ),
     );
