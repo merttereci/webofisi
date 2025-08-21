@@ -63,73 +63,71 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: Text('Web Ofisi', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.grey[800],
-        elevation: 1,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () => context.read<ProductProvider>().loadProducts(),
-          ),
-        ],
-      ),
-      body: Consumer<ProductProvider>(
-        builder: (context, productProvider, child) {
-          return Column(
-            children: [
-              // arama çubuğu
-              SearchBarWidget(),
+      // appbar kaldırıldı - safearea eklendi
+      body: SafeArea(
+        child: Consumer<ProductProvider>(
+          builder: (context, productProvider, child) {
+            return Column(
+              children: [
+                // arama çubuğu
+                SearchBarWidget(),
 
-              // içerik
-              Expanded(
-                child: productProvider.isLoading
-                    ? LoadingWidget()
-                    : productProvider.errorMessage.isNotEmpty
-                        ? Error1Widget(
-                            message: productProvider.errorMessage,
-                            onRetry: () => productProvider.loadProducts(),
-                          )
-                        : productProvider.displayedProducts.isEmpty &&
-                                productProvider.searchQuery.isNotEmpty
-                            ? Error1Widget(
-                                message: productProvider.errorMessage,
-                                onRetry: () => productProvider.loadProducts(),
-                              )
-                            : Column(
-                                children: [
-                                  // sonuç sayısı ve kategori seçici - callback geçildi
-                                  TotalAndCategoriesWidget(
-                                    onShowCategoryModal:
-                                        widget.onShowCategoryModal,
+                // içerik - refreshindicator ile sarıldı
+                Expanded(
+                  child: productProvider.isLoading
+                      ? LoadingWidget()
+                      : productProvider.errorMessage.isNotEmpty
+                          ? Error1Widget(
+                              message: productProvider.errorMessage,
+                              onRetry: () => productProvider.loadProducts(),
+                            )
+                          : productProvider.displayedProducts.isEmpty &&
+                                  productProvider.searchQuery.isNotEmpty
+                              ? Error1Widget(
+                                  message: productProvider.errorMessage,
+                                  onRetry: () => productProvider.loadProducts(),
+                                )
+                              : RefreshIndicator(
+                                  onRefresh: () async {
+                                    // aşağı çekme ile yenile
+                                    await productProvider.loadProducts();
+                                  },
+                                  color: const Color(0xFF667eea), // tema rengi
+                                  child: Column(
+                                    children: [
+                                      // sonuç sayısı ve kategori seçici
+                                      TotalAndCategoriesWidget(
+                                        onShowCategoryModal:
+                                            widget.onShowCategoryModal,
+                                      ),
+
+                                      // ürün kartları
+                                      Expanded(
+                                        child: ListView.builder(
+                                          // scroll controller'ı listview'e ata
+                                          controller: _scrollController,
+                                          padding: EdgeInsets.all(16.0),
+                                          itemCount: productProvider
+                                              .displayedProducts.length,
+                                          itemBuilder: (context, index) {
+                                            return ProductCard(
+                                              product: productProvider
+                                                  .displayedProducts[index],
+                                            );
+                                          },
+                                        ),
+                                      ),
+
+                                      // pagination kontrolleri
+                                      PaginationWidget(),
+                                    ],
                                   ),
-
-                                  // ürün kartları
-                                  Expanded(
-                                    child: ListView.builder(
-                                      // scroll controller'ı listview'e ata
-                                      controller: _scrollController,
-                                      padding: EdgeInsets.all(16.0),
-                                      itemCount: productProvider
-                                          .displayedProducts.length,
-                                      itemBuilder: (context, index) {
-                                        return ProductCard(
-                                          product: productProvider
-                                              .displayedProducts[index],
-                                        );
-                                      },
-                                    ),
-                                  ),
-
-                                  // pagination kontrolleri
-                                  PaginationWidget(),
-                                ],
-                              ),
-              ),
-            ],
-          );
-        },
+                                ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

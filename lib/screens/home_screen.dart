@@ -294,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             // alt boşluk - floating navbar için
-            const SizedBox(height: 100), // 30'dan 100'e çıktı
+            const SizedBox(height: 30),
           ],
         ),
       ),

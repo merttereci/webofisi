@@ -16,13 +16,13 @@ class Error1Widget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, color: Colors.red, size: 60),
-          SizedBox(height: 20),
-          Text(
+          const Icon(Icons.error_outline, color: Colors.red, size: 60),
+          const SizedBox(height: 20),
+          const Text(
             'Hata Oluştu',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
