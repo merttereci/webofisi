@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:web_ofisi_mobile/providers/cart_provider.dart';
 import 'package:web_ofisi_mobile/screens/auth_screen.dart';
 import 'package:web_ofisi_mobile/screens/main_screen.dart';
 import 'providers/product_provider.dart';
@@ -16,6 +17,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()), // YENİ EKLENEN
+        ChangeNotifierProvider(
+            create: (_) => CartProvider()), // BU SATIR VAR MI
       ],
       child: MaterialApp(
         title: 'Web Ofisi Mobile',

@@ -18,7 +18,7 @@ class FlashCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 280, // Kart genişliği
+      width: 300, // Kart genişliği
       margin: const EdgeInsets.only(right: 16.0),
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -39,7 +39,7 @@ class FlashCardWidget extends StatelessWidget {
           crossAxisAlignment:
               CrossAxisAlignment.start, // Tüm içeriği sola hizalar
           children: [
-            // ✨ ICON VE BAŞLIK İÇİN YENİ ROW YAPISI ✨
+            //  ICON VE BAŞLIK İÇİN YENİ ROW YAPISI
             Row(
               crossAxisAlignment:
                   CrossAxisAlignment.center, // İkon ve metni dikeyde ortalar

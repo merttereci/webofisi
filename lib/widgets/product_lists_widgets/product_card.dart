@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/product.dart';
-import '../../screens/product_detail_screen.dart'; // Yeni detay sayfasını import ediyoruz
+import '../../screens/product_detail_screen.dart';
+import '../../providers/cart_provider.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
@@ -36,12 +38,12 @@ class ProductCard extends StatelessWidget {
               );
             },
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(14), // 16'dan 14'e düşürüldü
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildProductImage(),
-                  SizedBox(width: 16),
+                  SizedBox(width: 14), // 16'dan 14'e düşürüldü
                   Expanded(child: _buildProductInfo()),
                 ],
               ),
@@ -54,16 +56,16 @@ class ProductCard extends StatelessWidget {
 
   Widget _buildProductImage() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(10), // 12'den 10'a düşürüldü
       child: Container(
-        width: 80,
-        height: 80,
+        width: 70, // 80'den 70'e düşürüldü
+        height: 70, // 80'den 70'e düşürüldü
         color: Colors.grey[100],
         child: product.image.isNotEmpty
             ? Image.network(
                 product.image,
-                width: 80,
-                height: 80,
+                width: 70,
+                height: 70,
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
@@ -82,7 +84,7 @@ class ProductCard extends StatelessWidget {
                     child: Icon(
                       Icons.image_not_supported,
                       color: Colors.grey[400],
-                      size: 32,
+                      size: 28, // 32'den 28'e düşürüldü
                     ),
                   );
                 },
@@ -91,7 +93,7 @@ class ProductCard extends StatelessWidget {
                 child: Icon(
                   Icons.web,
                   color: Colors.grey[400],
-                  size: 32,
+                  size: 28, // 32'den 28'e düşürüldü
                 ),
               ),
       ),
@@ -115,28 +117,29 @@ class ProductCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
 
-        SizedBox(height: 8),
+        SizedBox(height: 6), // 8'den 6'ya düşürüldü
 
         // Kodlama
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: EdgeInsets.symmetric(
+              horizontal: 6, vertical: 3), // Padding küçültüldü
           decoration: BoxDecoration(
             color: Colors.blue[50],
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(5), // 6'dan 5'e düşürüldü
           ),
           child: Text(
             product.coding,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11, // 12'den 11'e düşürüldü
               color: Colors.blue[700],
               fontWeight: FontWeight.w500,
             ),
           ),
         ),
 
-        SizedBox(height: 8),
-        const SizedBox(height: 4),
-        // Kategori(ler) - Kategori listesini birleştirerek gösteriyoruz
+        SizedBox(height: 6), // 8'den 6'ya düşürüldü
+
+        // Kategori(ler)
         Text(
           product.category.isNotEmpty
               ? product.category.join(', ')
@@ -150,12 +153,13 @@ class ProductCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
 
-        SizedBox(height: 12),
+        SizedBox(height: 10), // 12'den 10'a düşürüldü
 
-        // Fiyat
+        // Fiyat ve Sepet Butonu
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // Fiyat (Sol)
             Text(
               '${product.price.toStringAsFixed(0)} ${product.priceUnit}',
               style: TextStyle(
@@ -164,10 +168,41 @@ class ProductCard extends StatelessWidget {
                 color: Colors.green[600],
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: Colors.grey[400],
+
+            // Sepet Butonu (Sağ) - Daha şık ve küçük
+            Consumer<CartProvider>(
+              builder: (context, cartProvider, child) {
+                final isInCart = cartProvider.isInCart(product.id);
+
+                return GestureDetector(
+                  onTap: () {
+                    cartProvider.toggleCart(product.id);
+                  },
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: isInCart ? Colors.green[600] : Colors.blue[600],
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (isInCart
+                                  ? Colors.green[600]!
+                                  : Colors.blue[600]!)
+                              .withOpacity(0.3),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      isInCart ? Icons.check : Icons.shopping_cart,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
