@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web_ofisi_mobile/providers/cart_provider.dart';
-import 'package:web_ofisi_mobile/screens/cart_screen.dart';
 import 'package:web_ofisi_mobile/widgets/product_card_v2.dart';
 import '../providers/product_provider.dart';
 import '../providers/user_provider.dart'; // user provider import eklendi

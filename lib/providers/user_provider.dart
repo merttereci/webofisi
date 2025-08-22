@@ -89,6 +89,11 @@ class UserProvider extends ChangeNotifier {
         _authToken = result['token'];
         _currentUser = result['user'];
 
+        print('✅ UserProvider: Login başarılı');
+        print('👤 Token: ${result['token']}');
+        print(
+            '👤 User: ${result['user'].ad} ${result['user'].soyad} (ID: ${result['user'].id})');
+
         // Token ve kullanıcı bilgilerini kaydet
         await _saveAuthData();
 

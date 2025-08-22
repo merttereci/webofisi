@@ -14,7 +14,7 @@ class ProductProvider extends ChangeNotifier {
   String _searchQuery = ''; // Kullanıcının yazdığı arama metni
   String? _selectedCategory; // Seçili kategori (yoksa null)
 
-  static const int _itemsPerPage = 8; // Her sayfada 8 ürün göster
+  static const int _itemsPerPage = 16; // Her sayfada 8 ürün göster
   int _currentPage = 0; // O anki sayfa numarası
 
   // Getters

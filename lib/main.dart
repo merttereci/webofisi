@@ -5,8 +5,13 @@ import 'package:web_ofisi_mobile/screens/auth_screen.dart';
 import 'package:web_ofisi_mobile/screens/main_screen.dart';
 import 'providers/product_provider.dart';
 import 'providers/user_provider.dart';
+import 'services/mock_api_service.dart'; // YENİ IMPORT
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // ==================== APP START ====================
+  print('🚀 Uygulama başlatılıyor...');
   runApp(MyApp());
 }
 
@@ -16,9 +21,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ProductProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider()), // YENİ EKLENEN
-        ChangeNotifierProvider(
-            create: (_) => CartProvider()), // BU SATIR VAR MI
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MaterialApp(
         title: 'Web Ofisi Mobile',
@@ -27,7 +31,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: AuthWrapper(), // YENİ: AuthWrapper kullanıyoruz
+        home: AuthWrapper(),
       ),
     );
   }

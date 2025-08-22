@@ -1,81 +1,38 @@
 import 'dart:convert';
-import 'package:flutter/services.dart';
 import '../models/tables/uyeler.dart';
+import 'mock_api_service.dart'; // YENİ IMPORT
 
 class AuthService {
-  // Mock users listesi
-  static List<TabloUyeler> _mockUsers = [];
+  // Artık Mock API Server kullanıyoruz - asset JSON değil!
 
-  // Mock users'ı yükle
-  static Future<void> loadMockUsers() async {
-    if (_mockUsers.isEmpty) {
-      try {
-        final String jsonString =
-            await rootBundle.loadString('assets/data/mock_users.json');
-        final List<dynamic> jsonList = json.decode(jsonString);
-        _mockUsers =
-            jsonList.map((json) => TabloUyeler.fromJson(json)).toList();
-        print('Mock kullanıcılar yüklendi: ${_mockUsers.length} adet');
-      } catch (e) {
-        print('Mock kullanıcılar yüklenemedi: $e');
-        // Varsayılan kullanıcılar
-        _mockUsers = [
-          TabloUyeler(
-            id: 1,
-            ad: 'Demo',
-            soyad: 'Kullanıcı',
-            email: 'demo@webofisi.com',
-            sifre: 'demo123',
-            telefon: '5551234567',
-            statu: 1,
-            durum: 1,
-          ),
-        ];
-      }
-    }
-  }
-
-  // Giriş yapma (Mock)
+  // Giriş yapma (Mock API Server)
   static Future<Map<String, dynamic>> login(
       String email, String password) async {
     // Mock delay
     await Future.delayed(const Duration(milliseconds: 800));
 
-    // Mock users'ı yükle
-    await loadMockUsers();
-
-    /**
-     
-      await loadMockUsers();
-      final user = _mockUsers.firstWhere(...);
-  
-      Gelecekte:
-      final response = await http.post(
-      Uri.parse('${ApiConstants.baseUrl}auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email, 'password': password}),
-    );
-  
-      if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-        return {
-        'success': true,
-        'token': data['token'],        // Gerçek JWT
-        'user': TabloUyeler.fromJson(data['user']),
-    };
-  }
-}
-     */
-
     try {
-      // Kullanıcıyı bul
-      final user = _mockUsers.firstWhere(
-        (u) => u.email == email && u.sifre == password,
-        orElse: () => TabloUyeler(id: -1, email: '', sifre: ''),
-      );
+      // Mock API Server'dan kullanıcı ara
+      final userData = await MockApiService.loginUser(email, password);
 
-      if (user.id != -1) {
-        // Başarılı giriş
+      if (userData != null) {
+        print(
+            '✅ AuthService: Kullanıcı bulundu - ${userData['ad']} ${userData['soyad']}');
+
+        //şuanki mock database idleri string ürettiği için...
+        if (userData['id'] is String) {
+          try {
+            userData['id'] = int.parse(userData['id'], radix: 16);
+            print('🔧 AuthService: String ID → Int ID: ${userData['id']}');
+          } catch (e) {
+            userData['id'] = DateTime.now().millisecondsSinceEpoch % 100000;
+          }
+        }
+
+        // TabloUyeler modeline çevir
+        final user = TabloUyeler.fromJson(userData);
+
+        // Token oluştur
         final token = _generateMockToken(user.id);
 
         return {
@@ -85,9 +42,11 @@ class AuthService {
           'message': 'Giriş başarılı!'
         };
       } else {
+        print('❌ AuthService: Kullanıcı bulunamadı');
         return {'success': false, 'message': 'E-posta veya şifre hatalı!'};
       }
     } catch (e) {
+      print('❌ AuthService Login Error: $e');
       return {
         'success': false,
         'message': 'Giriş işlemi sırasında bir hata oluştu: $e'
@@ -95,90 +54,137 @@ class AuthService {
     }
   }
 
-  // Kayıt olma (Mock)
+  // Kayıt olma (Mock API Server)
   static Future<Map<String, dynamic>> register(TabloUyeler newUser) async {
     // Mock delay
     await Future.delayed(const Duration(milliseconds: 800));
 
-    // Mock users'ı yükle
-    await loadMockUsers();
+    try {
+      print('📝 AuthService: Mock API ile register deneniyor...');
+      print('📧 Email: ${newUser.email}');
 
-    // E-posta kontrolü
-    if (_mockUsers.any((user) => user.email == newUser.email)) {
+      // Önce e-posta kontrolü yap
+      final existingUser =
+          await MockApiService.loginUser(newUser.email!, 'dummy_password');
+      if (existingUser != null) {
+        print('❌ AuthService: E-posta zaten kullanılıyor');
+        return {
+          'success': false,
+          'message': 'Bu e-posta adresi zaten kullanılıyor!'
+        };
+      }
+
+      // Yeni kullanıcı verisini hazırla
+      final userData = {
+        'fbid': 0,
+        'hesap': 1,
+        'vergi': 1,
+        'ad': newUser.ad,
+        'soyad': newUser.soyad,
+        'email': newUser.email,
+        'telefon': newUser.telefon,
+        'sifre': newUser.sifre,
+        'resim': '',
+        'il': '',
+        'ilce': '',
+        'adres': '',
+        'tc': '',
+        'firmaadi': '',
+        'vergino': '',
+        'vergidairesi': '',
+        'firma_tel': '',
+        'firma_adres': '',
+        'kampanya_eposta': 1,
+        'kampanya_sms': 0,
+        'indirim': '0',
+        'statu': 0,
+        'durum': 1,
+        'ceponay': 0,
+        'cepkod': '',
+        'emailonay': 1,
+        'emailkod': '',
+        'son_giris': DateTime.now().toString(),
+        'tarih': DateTime.now().toString(),
+        'ay': DateTime.now().month.toString().padLeft(2, '0'),
+        'ktarih': DateTime.now().toString().split(' ')[0],
+        'parasutuyeid': 0,
+        'vatandas': 1,
+        'vip': 0,
+        'mnot': '',
+        'ip': '127.0.0.1',
+      };
+
+      // Mock API Server'a yeni kullanıcı ekle
+      final createdUser = await MockApiService.registerUser(userData);
+
+      print('✅ AuthService: Kullanıcı oluşturuldu - ID: ${createdUser['id']}');
+
+      //şuanki mock database idleri string ürettiği için...
+      if (createdUser['id'] is String) {
+        // Hex string'i integer'a çevir
+        createdUser['id'] = DateTime.now().millisecondsSinceEpoch % 100000;
+        print('🔧 AuthService: String ID → Int ID: ${createdUser['id']}');
+      }
+
+      // TabloUyeler modeline çevir
+      final user = TabloUyeler.fromJson(createdUser);
+
+      // Token oluştur
+      final token = _generateMockToken(user.id);
+
+      return {
+        'success': true,
+        'token': token,
+        'user': user,
+        'message': 'Kayıt başarılı! Hoş geldiniz!'
+      };
+    } catch (e) {
+      print('❌ AuthService Register Error: $e');
       return {
         'success': false,
-        'message': 'Bu e-posta adresi zaten kullanılıyor!'
+        'message': 'Kayıt işlemi sırasında bir hata oluştu: $e'
       };
     }
-
-    // Yeni kullanıcıya ID ata
-    final maxId = _mockUsers.isEmpty
-        ? 0
-        : _mockUsers.map((u) => u.id).reduce((a, b) => a > b ? a : b);
-    final userWithId = TabloUyeler(
-      id: maxId + 1,
-      ad: newUser.ad,
-      soyad: newUser.soyad,
-      email: newUser.email,
-      sifre: newUser.sifre,
-      telefon: newUser.telefon,
-      statu: 0, // Yeni kullanıcı normal statüde başlar
-      durum: 1, // Aktif
-      emailonay: 0, // E-posta onayı bekliyor
-      tarih: DateTime.now().toIso8601String(),
-    );
-
-    // Listeye ekle (sadece session için, kalıcı değil)
-    _mockUsers.add(userWithId);
-
-    // Token oluştur
-    final token = _generateMockToken(userWithId.id);
-
-    return {
-      'success': true,
-      'token': token,
-      'user': userWithId,
-      'message': 'Kayıt başarılı! Hoş geldiniz!'
-    };
   }
 
   // Mock token oluştur
   static String _generateMockToken(int userId) {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final token = 'mock_token_${userId}_$timestamp';
 
-    // Gerçek JWT formatına benzer bir token oluştur (görsellik için)
+    // Gerçek JWT formatına benzer bir token oluştur
     final header = base64.encode(utf8.encode('{"alg":"HS256","typ":"JWT"}'));
     final payload =
         base64.encode(utf8.encode('{"userId":$userId,"exp":$timestamp}'));
-    final signature = base64.encode(utf8.encode('mock_signature'));
+    final signature = base64.encode(utf8.encode('mock_signature_$userId'));
 
     return '$header.$payload.$signature';
   }
 
   // Token doğrulama (Mock)
   static Future<bool> validateToken(String token) async {
-    // Mock için her zaman geçerli
-    return token.startsWith('mock_token_') || token.contains('.');
+    // Mock için basit kontrol
+    return token.contains('.') && token.split('.').length == 3;
   }
 
   // Şifre sıfırlama (Mock)
   static Future<Map<String, dynamic>> resetPassword(String email) async {
     await Future.delayed(const Duration(milliseconds: 800));
 
-    await loadMockUsers();
+    try {
+      // E-posta var mı kontrol et
+      final userData = await MockApiService.loginUser(email, 'dummy_password');
+      // Bu işlem başarısız olacak ama 404 vs almayacağız, sadece null dönecek
 
-    final userExists = _mockUsers.any((user) => user.email == email);
-
-    if (userExists) {
+      // E-posta sistemde kayıtlı mı kontrol etmek için farklı bir yaklaşım
+      // Şimdilik basit bir mock response döndürüyoruz
       return {
         'success': true,
         'message': 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.'
       };
-    } else {
+    } catch (e) {
       return {
         'success': false,
-        'message': 'Bu e-posta adresi sistemde kayıtlı değil.'
+        'message': 'E-posta doğrulama sırasında hata oluştu.'
       };
     }
   }
@@ -188,5 +194,76 @@ class AuthService {
     await Future.delayed(const Duration(milliseconds: 500));
     // Mock için basit kontrol
     return code.length == 6;
+  }
+
+  // Kullanıcı profili güncelleme
+  static Future<Map<String, dynamic>> updateProfile(
+      int userId, TabloUyeler updatedUser) async {
+    try {
+      print('🔄 AuthService: Profil güncelleniyor - User ID: $userId');
+
+      // Mock API Server'da kullanıcı bilgilerini güncelle
+      final userData = updatedUser.toJson();
+      final result = await MockApiService.updateUser(userId, userData);
+
+      final user = TabloUyeler.fromJson(result);
+
+      return {
+        'success': true,
+        'user': user,
+        'message': 'Profil başarıyla güncellendi!'
+      };
+    } catch (e) {
+      print('❌ AuthService Update Error: $e');
+      return {
+        'success': false,
+        'message': 'Profil güncellenirken hata oluştu: $e'
+      };
+    }
+  }
+}
+
+// TabloUyeler için toJson extension
+extension TabloUyelerJson on TabloUyeler {
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'fbid': fbid,
+      'hesap': hesap,
+      'vergi': vergi,
+      'ad': ad,
+      'soyad': soyad,
+      'email': email,
+      'telefon': telefon,
+      'sifre': sifre,
+      'resim': resim,
+      'il': il,
+      'ilce': ilce,
+      'adres': adres,
+      'tc': tc,
+      'firmaadi': firmaadi,
+      'vergino': vergino,
+      'vergidairesi': vergidairesi,
+      'firma_tel': firma_tel,
+      'firma_adres': firma_adres,
+      'kampanya_eposta': kampanya_eposta,
+      'kampanya_sms': kampanya_sms,
+      'indirim': indirim,
+      'statu': statu,
+      'durum': durum,
+      'ceponay': ceponay,
+      'cepkod': cepkod,
+      'emailonay': emailonay,
+      'emailkod': emailkod,
+      'son_giris': son_giris,
+      'tarih': tarih,
+      'ay': ay,
+      'ktarih': ktarih,
+      'parasutuyeid': parasutuyeid,
+      'vatandas': vatandas,
+      'vip': vip,
+      'mnot': mnot,
+      'ip': ip,
+    };
   }
 }

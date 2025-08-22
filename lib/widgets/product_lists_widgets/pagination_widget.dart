@@ -11,13 +11,15 @@ class PaginationWidget extends StatelessWidget {
         if (provider.totalPages <= 1) return SizedBox.shrink();
 
         return Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          margin: const EdgeInsets.only(bottom: 8), // Alt margin azaltıldı
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(8), // Köşeler yuvarlatıldı
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 6,
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 4,
                 offset: const Offset(0, -1),
               ),
             ],
@@ -25,7 +27,7 @@ class PaginationWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // önceki ok
+              // önceki ok - daha küçük
               _buildArrowButton(
                 icon: Icons.chevron_left,
                 isEnabled: provider.currentPage > 0,
@@ -34,17 +36,25 @@ class PaginationWidget extends StatelessWidget {
                     : null,
               ),
 
-              // sayfa bilgisi - sadece sayfa numarası
-              Text(
-                '${provider.currentPage + 1} / ${provider.totalPages}',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[700],
+              // sayfa bilgisi - daha küçük font
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${provider.currentPage + 1} / ${provider.totalPages}',
+                  style: TextStyle(
+                    fontSize: 14, // Font size küçültüldü
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ),
 
-              // sonraki ok
+              // sonraki ok - daha küçük
               _buildArrowButton(
                 icon: Icons.chevron_right,
                 isEnabled: provider.currentPage < provider.totalPages - 1,
@@ -59,7 +69,7 @@ class PaginationWidget extends StatelessWidget {
     );
   }
 
-  // ok buton builder - çok kompakt
+  // ok buton builder - daha kompakt
   Widget _buildArrowButton({
     required IconData icon,
     required bool isEnabled,
@@ -68,23 +78,23 @@ class PaginationWidget extends StatelessWidget {
     return GestureDetector(
       onTap: isEnabled ? onTap : null,
       child: Container(
-        width: 36,
-        height: 36,
+        width: 30, // 36'dan 30'a küçültüldü
+        height: 30, // 36'dan 30'a küçültüldü
         decoration: BoxDecoration(
           color: isEnabled
-              ? const Color(0xFF667eea).withOpacity(0.1)
+              ? const Color(0xFF667eea).withOpacity(0.08)
               : Colors.grey[100],
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(6), // 8'den 6'ya küçültüldü
           border: Border.all(
             color: isEnabled
-                ? const Color(0xFF667eea).withOpacity(0.3)
+                ? const Color(0xFF667eea).withOpacity(0.2)
                 : Colors.grey[300]!,
-            width: 1,
+            width: 0.5, // Border width küçültüldü
           ),
         ),
         child: Icon(
           icon,
-          size: 20,
+          size: 18, // 20'den 18'e küçültüldü
           color: isEnabled ? const Color(0xFF667eea) : Colors.grey[400],
         ),
       ),

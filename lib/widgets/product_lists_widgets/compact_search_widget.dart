@@ -28,7 +28,7 @@ class _CompactSearchWidgetState extends State<CompactSearchWidget> {
       builder: (context, provider, child) {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-          color: Colors.white,
+          color: Colors.grey[50],
           child: Row(
             children: [
               // Arama kutusu (Sol - 2/3 alan)

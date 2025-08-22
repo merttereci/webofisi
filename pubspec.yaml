@@ -71,7 +71,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/data/mock_users.json
     - assets/logo/logo.png
     - assets/launcher/icon.png
    
