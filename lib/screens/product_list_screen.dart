@@ -1,16 +1,17 @@
 // lib/screens/product_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:web_ofisi_mobile/widgets/product_lists_widgets/total_and_categories_widget.dart';
 import '../providers/product_provider.dart';
-import '../widgets/product_lists_widgets/search_bar_widget.dart';
+import '../providers/cart_provider.dart'; // YENİ IMPORT
+import '../widgets/cart_modal_widget.dart'; // YENİ IMPORT
+import '../widgets/product_lists_widgets/compact_search_widget.dart';
 import '../widgets/product_lists_widgets/product_card.dart';
 import '../widgets/product_lists_widgets/pagination_widget.dart';
 import '../widgets/product_lists_widgets/loading_widget.dart';
 import '../widgets/product_lists_widgets/error_widget.dart';
 
 class ProductListScreen extends StatefulWidget {
-  final VoidCallback? onShowCategoryModal; // callback eklendi
+  final VoidCallback? onShowCategoryModal;
 
   const ProductListScreen({Key? key, this.onShowCategoryModal})
       : super(key: key);
@@ -20,32 +21,25 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
-  // scroll controller tanımı
   final ScrollController _scrollController = ScrollController();
-
-  // product provider'ı dinlemek için değişken
   late ProductProvider _productProvider;
 
   @override
   void initState() {
     super.initState();
-    // product provider'ı başlat
     _productProvider = context.read<ProductProvider>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _productProvider.loadProducts();
     });
-    // product provider'daki değişiklikleri dinlemek için listener ekle
     _productProvider.addListener(_scrollToTopOnStateChange);
   }
 
-  // product provider değiştiğinde çağrılacak metod
   void _scrollToTopOnStateChange() {
-    // eğer kaydırma kontrolcüsü bağlıysa ve en üstte değilse, en üste kaydır
     if (_scrollController.hasClients && _scrollController.offset != 0.0) {
       _scrollController.animateTo(
-        0.0, // en üste kaydır
-        duration: const Duration(milliseconds: 300), // hafif bir animasyonla
+        0.0,
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     }
@@ -53,7 +47,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   @override
   void dispose() {
-    // controller ve listener'ı dispose etmeyi unutmayın
     _scrollController.dispose();
     _productProvider.removeListener(_scrollToTopOnStateChange);
     super.dispose();
@@ -63,16 +56,90 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      // appbar kaldırıldı - safearea eklendi
+      // AppBar eklendi - HomeScreen ile aynı
+      appBar: AppBar(
+        backgroundColor: Colors.grey[50],
+        elevation: 1,
+        shadowColor: Colors.black.withOpacity(0.1),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        title: Container(
+          height: 40,
+          child: Image.asset(
+            'assets/logo/logo.png',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return const Text(
+                'Web Ofisi',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: Color(0xFF667eea),
+                ),
+              );
+            },
+          ),
+        ),
+        actions: [
+          // Sepet ikonu + badge
+          Consumer<CartProvider>(
+            builder: (context, cartProvider, child) {
+              return IconButton(
+                onPressed: () {
+                  CartModalWidget.show(context); // YENİ: Widget kullanımı
+                },
+                icon: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      Icons.shopping_cart,
+                      color: Colors.grey[700],
+                      size: 24,
+                    ),
+                    if (cartProvider.isNotEmpty)
+                      Positioned(
+                        right: -6,
+                        top: -4,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 14,
+                            minHeight: 14,
+                          ),
+                          child: Text(
+                            '${cartProvider.itemCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: Consumer<ProductProvider>(
           builder: (context, productProvider, child) {
             return Column(
               children: [
-                // arama çubuğu
-                SearchBarWidget(),
+                // YENİ: Kompakt arama + kategori widget'ı
+                CompactSearchWidget(
+                  onShowCategoryModal: widget.onShowCategoryModal,
+                ),
 
-                // içerik - refreshindicator ile sarıldı
+                // Ana içerik
                 Expanded(
                   child: productProvider.isLoading
                       ? LoadingWidget()
@@ -89,24 +156,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                 )
                               : RefreshIndicator(
                                   onRefresh: () async {
-                                    // aşağı çekme ile yenile
                                     await productProvider.loadProducts();
                                   },
-                                  color: const Color(0xFF667eea), // tema rengi
+                                  color: const Color(0xFF667eea),
                                   child: Column(
                                     children: [
-                                      // sonuç sayısı ve kategori seçici
-                                      TotalAndCategoriesWidget(
-                                        onShowCategoryModal:
-                                            widget.onShowCategoryModal,
-                                      ),
-
-                                      // ürün kartları
+                                      // Ürün kartları - daha fazla alan
                                       Expanded(
                                         child: ListView.builder(
-                                          // scroll controller'ı listview'e ata
                                           controller: _scrollController,
-                                          padding: EdgeInsets.all(16.0),
+                                          padding: const EdgeInsets.all(16.0),
                                           itemCount: productProvider
                                               .displayedProducts.length,
                                           itemBuilder: (context, index) {
@@ -118,7 +177,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                         ),
                                       ),
 
-                                      // pagination kontrolleri
+                                      // Pagination - daha kompakt
                                       PaginationWidget(),
                                     ],
                                   ),

@@ -9,6 +9,7 @@ import '../providers/user_provider.dart'; // user provider import eklendi
 import '../widgets/flash_card_widget.dart';
 import '../widgets/product_lists_widgets/loading_widget.dart';
 import '../widgets/product_lists_widgets/error_widget.dart';
+import '../widgets/cart_modal_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(int)? onTabChange; // callback eklendi
@@ -27,66 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProductProvider>().loadProducts();
     });
-  }
-
-  void _showCartModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true, // tam ekran olabilir
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.85, // ekranın %85'i
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: Column(
-          children: [
-            // modal handle (çizgi)
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(top: 12, bottom: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            // başlık
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Sepetim',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.shopping_bag, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
-
-            const Divider(),
-
-            // sepet içeriği - şimdilik CartScreen'i kullan
-            Expanded(
-              child: CartScreen(), // mevcut CartScreen widget'ı
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   @override
@@ -122,59 +63,49 @@ class _HomeScreenState extends State<HomeScreen> {
         // home_screen.dart AppBar actions - TAM VERSİYON
 
         actions: [
-          Container(
-            width: 48,
-            height: 48,
-            child: Consumer<CartProvider>(
-              builder: (context, cartProvider, child) {
-                return IconButton(
-                  onPressed: () {
-                    _showCartModal(context);
-                  },
-                  padding: EdgeInsets.zero,
-                  icon: SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Icon(
-                          Icons.shopping_cart,
-                          color: Colors.grey[700],
-                          size: 24,
-                        ),
-                        // Badge - sadece sepet boş değilse göster
-                        if (cartProvider.isNotEmpty)
-                          Positioned(
-                            right: -6,
-                            top: -4,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              constraints: const BoxConstraints(
-                                minWidth: 14,
-                                minHeight: 14,
-                              ),
-                              child: Text(
-                                '${cartProvider.itemCount}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                      ],
+          Consumer<CartProvider>(
+            builder: (context, cartProvider, child) {
+              return IconButton(
+                onPressed: () {
+                  CartModalWidget.show(context); // YENİ: Widget kullanımı
+                },
+                icon: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      Icons.shopping_cart,
+                      color: Colors.grey[700],
+                      size: 24,
                     ),
-                  ),
-                );
-              },
-            ),
+                    if (cartProvider.isNotEmpty)
+                      Positioned(
+                        right: -6,
+                        top: -4,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 14,
+                            minHeight: 14,
+                          ),
+                          child: Text(
+                            '${cartProvider.itemCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
           ),
           const SizedBox(width: 8),
         ],
