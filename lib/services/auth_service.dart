@@ -12,24 +12,18 @@ class AuthService {
     await Future.delayed(const Duration(milliseconds: 800));
 
     try {
+      print('🔐 AuthService: Login denemesi - $email');
+
       // Mock API Server'dan kullanıcı ara
       final userData = await MockApiService.loginUser(email, password);
 
       if (userData != null) {
         print(
             '✅ AuthService: Kullanıcı bulundu - ${userData['ad']} ${userData['soyad']}');
+        print(
+            '👤 User ID: ${userData['id']} (Type: ${userData['id'].runtimeType})');
 
-        //şuanki mock database idleri string ürettiği için...
-        if (userData['id'] is String) {
-          try {
-            userData['id'] = int.parse(userData['id'], radix: 16);
-            print('🔧 AuthService: String ID → Int ID: ${userData['id']}');
-          } catch (e) {
-            userData['id'] = DateTime.now().millisecondsSinceEpoch % 100000;
-          }
-        }
-
-        // TabloUyeler modeline çevir
+        // TabloUyeler modeline çevir - ID'yi olduğu gibi bırak
         final user = TabloUyeler.fromJson(userData);
 
         // Token oluştur
@@ -76,6 +70,7 @@ class AuthService {
 
       // Yeni kullanıcı verisini hazırla
       final userData = {
+        // ID'yi JSON-server otomatik atamasına izin ver
         'fbid': 0,
         'hesap': 1,
         'vergi': 1,
@@ -117,16 +112,10 @@ class AuthService {
       // Mock API Server'a yeni kullanıcı ekle
       final createdUser = await MockApiService.registerUser(userData);
 
-      print('✅ AuthService: Kullanıcı oluşturuldu - ID: ${createdUser['id']}');
+      print(
+          '✅ AuthService: Kullanıcı oluşturuldu - ID: ${createdUser['id']} (Type: ${createdUser['id'].runtimeType})');
 
-      //şuanki mock database idleri string ürettiği için...
-      if (createdUser['id'] is String) {
-        // Hex string'i integer'a çevir
-        createdUser['id'] = DateTime.now().millisecondsSinceEpoch % 100000;
-        print('🔧 AuthService: String ID → Int ID: ${createdUser['id']}');
-      }
-
-      // TabloUyeler modeline çevir
+      // TabloUyeler modeline çevir - ID'yi olduğu gibi bırak
       final user = TabloUyeler.fromJson(createdUser);
 
       // Token oluştur
@@ -148,13 +137,13 @@ class AuthService {
   }
 
   // Mock token oluştur
-  static String _generateMockToken(int userId) {
+  static String _generateMockToken(dynamic userId) {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
 
     // Gerçek JWT formatına benzer bir token oluştur
     final header = base64.encode(utf8.encode('{"alg":"HS256","typ":"JWT"}'));
     final payload =
-        base64.encode(utf8.encode('{"userId":$userId,"exp":$timestamp}'));
+        base64.encode(utf8.encode('{"userId":"$userId","exp":$timestamp}'));
     final signature = base64.encode(utf8.encode('mock_signature_$userId'));
 
     return '$header.$payload.$signature';
@@ -196,7 +185,7 @@ class AuthService {
     return code.length == 6;
   }
 
-  // Kullanıcı profili güncelleme
+  // Kullanıcı profili güncelleme - INT userId (değişiklik yok)
   static Future<Map<String, dynamic>> updateProfile(
       int userId, TabloUyeler updatedUser) async {
     try {

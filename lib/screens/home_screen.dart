@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web_ofisi_mobile/providers/cart_provider.dart';
+import 'package:web_ofisi_mobile/providers/favorites_provider.dart'; //...
 import 'package:web_ofisi_mobile/widgets/product_card_v2.dart';
 import '../providers/product_provider.dart';
 import '../providers/user_provider.dart'; // user provider import eklendi
@@ -9,6 +10,7 @@ import '../widgets/flash_card_widget.dart';
 import '../widgets/product_lists_widgets/loading_widget.dart';
 import '../widgets/product_lists_widgets/error_widget.dart';
 import '../widgets/cart_modal_widget.dart';
+import '../screens/favorites_screen.dart'; // YENİ IMPORT
 
 class HomeScreen extends StatefulWidget {
   final Function(int)? onTabChange; // callback eklendi
@@ -26,6 +28,14 @@ class _HomeScreenState extends State<HomeScreen> {
     // ürünleri yükle
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ProductProvider>().loadProducts();
+
+      // YENİ: Login olan kullanıcı için favorileri de yükle
+      final userProvider = context.read<UserProvider>();
+      if (userProvider.isLoggedIn && userProvider.currentUser != null) {
+        context
+            .read<FavoritesProvider>()
+            .loadFavorites(userProvider.currentUser!.id);
+      }
     });
   }
 
@@ -107,6 +117,57 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           const SizedBox(width: 8),
+          // YENİ: Favoriler ikonu
+          Consumer2<FavoritesProvider, UserProvider>(
+            builder: (context, favoritesProvider, userProvider, child) {
+              return IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FavoritesScreen(),
+                    ),
+                  );
+                },
+                icon: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      Icons.favorite,
+                      color: Colors.grey[700],
+                      size: 24,
+                    ),
+                    if (userProvider.isLoggedIn &&
+                        favoritesProvider.favoriteCount > 0)
+                      Positioned(
+                        right: -6,
+                        top: -4,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 14,
+                            minHeight: 14,
+                          ),
+                          child: Text(
+                            '${favoritesProvider.favoriteCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: SingleChildScrollView(

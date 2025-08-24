@@ -1,14 +1,64 @@
-// lib/widgets/product_card_v2.dart (Basitleştirilmiş - Miktar Yok)
+// lib/widgets/product_card_v2.dart (BasitleÅŸtirilmiÅŸ - Miktar Yok)
 import 'package:flutter/material.dart';
 import '../models/product.dart';
 import '../screens/product_detail_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
+import '../providers/favorites_provider.dart'; // YENİ IMPORT
+import '../providers/user_provider.dart'; // YENİ IMPORT
 
 class ProductCardV2 extends StatelessWidget {
   final Product product;
 
   const ProductCardV2({Key? key, required this.product}) : super(key: key);
+
+  // Favori toggle fonksiyonu
+  void _toggleFavorite(BuildContext context) async {
+    final userProvider = context.read<UserProvider>();
+    final favoritesProvider = context.read<FavoritesProvider>();
+
+    // Kullanıcı giriş yapmış mı kontrol et
+    if (!userProvider.isLoggedIn || userProvider.currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Favorilere eklemek için giriş yapmalısınız'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Favori toggle işlemi
+    final success = await favoritesProvider.toggleFavorite(
+      userProvider.currentUser!.id,
+      product.id,
+    );
+
+    if (success) {
+      final isFavorite = favoritesProvider.isFavorite(product.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isFavorite
+                ? '${product.name} favorilere eklendi'
+                : '${product.name} favorilerden çıkarıldı',
+          ),
+          backgroundColor: isFavorite ? Colors.green : Colors.orange,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      // Hata durumunda bildirim
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Favori güncellenirken hata oluştu'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,34 +92,73 @@ class ProductCardV2 extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Ürün Görseli
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(16)),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: Image.network(
-                  product.image.isNotEmpty
-                      ? product.image
-                      : 'https://via.placeholder.com/300x170?text=Görsel+Yok',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    color: Colors.grey[200],
-                    child: Icon(Icons.broken_image,
-                        color: Colors.grey[400], size: 50),
+            // ÃœrÃ¼n GÃ¶rseli + Favori Butonu Stack
+            Stack(
+              children: [
+                // Ürün görseli
+                ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Image.network(
+                      product.image.isNotEmpty
+                          ? product.image
+                          : 'https://via.placeholder.com/300x170?text=GÃ¶rsel+Yok',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[200],
+                        child: Icon(Icons.broken_image,
+                            color: Colors.grey[400], size: 50),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                // YENİ: Favori butonu (sağ üst köşe)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Consumer2<FavoritesProvider, UserProvider>(
+                    builder: (context, favoritesProvider, userProvider, child) {
+                      final isFavorite =
+                          favoritesProvider.isFavorite(product.id);
+
+                      return GestureDetector(
+                        onTap: () => _toggleFavorite(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            color: isFavorite ? Colors.red : Colors.grey[600],
+                            size: 18,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
 
-            // Ürün Bilgileri
+            // ÃœrÃ¼n Bilgileri
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Ürün adı ve kategori
+                    // ürün adı ve kategori
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,7 +204,7 @@ class ProductCardV2 extends StatelessWidget {
                           ),
                         ),
 
-                        // Sepete Ekle Butonu (Sağ)
+                        // Sepete Ekle Butonu (SaÄŸ)
                         Consumer<CartProvider>(
                           builder: (context, cartProvider, child) {
                             final isInCart = cartProvider.isInCart(product.id);

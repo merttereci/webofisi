@@ -21,6 +21,7 @@ lib/
 ├── providers/                          # State Management (Provider)
 │   ├── cart_provider.dart             # Sepet state yönetimi (minimal ID-based)
 │   ├── product_provider.dart          # Ürün state yönetimi
+│   ├── favorites_provider.dart        # Favoriler state yönetimi
 │   └── user_provider.dart             # Kullanıcı state yönetimi
 ├── screens/                           # Uygulama ekranları
 │   ├── tabs/                          # Tab ekranları
@@ -29,6 +30,7 @@ lib/
 │   │   └── profile_tab.dart           # Profil tab
 │   ├── auth_screen.dart               # Giriş ve kayıt ekranı
 │   ├── cart_screen.dart               # Sepet ekranı (modal içerik)
+│   ├── favorites_screen.dart          # Favoriler ekranı (modal gibi ama normal sayfa şuanda)
 │   ├── home_screen.dart               # Ana sayfa ekranı (AppBar + sepet ikonu)
 │   ├── main_screen.dart               # Ana ekran (3-tab navigation)
 │   ├── product_detail_screen.dart     # Ürün detay ekranı
@@ -56,24 +58,22 @@ lib/
         ├── pagination_widget.dart     # Sayfalama widget'ı
         ├── product_card.dart          # Ana ürün kartı (ürünler sayfası)
 
-# **YENİ DOSYALAR:**
-├── db.json                            # **YENİ** - JSON Mock Server veritabanı
-└── package.json                       # **YENİ** - Mock server konfigürasyonu (opsiyonel)
+└── db.json                            # **YENİ** - JSON Mock Server veritabanı
 ```
 
 ## Proje Açıklaması
 
-Web Ofisi Mobile, kurumsal web yazılımları satışı için geliştirilmiş modern bir Flutter e-ticaret uygulamasıdir. **İki farklı veri kaynağı** kullanarak hybrid bir yaklaşım benimser: XML API'den 158 adet hazır web scripti çekerken, kullanıcı verilerini JSON Mock Server üzerinden yönetir.
+Web Ofisi Mobile, kurumsal web yazılımları satışı için geliştirilmiş modern bir Flutter e-ticaret uygulamasıdir. **İki farklı veri kaynağı** kullanarak hybrid bir yaklaşım benimser: XML den 158 adet hazır web scripti çekerken(ürünler), kullanıcı verilerini JSON Mock Server üzerinden yönetir (gelecekte API üzerinden veritabanına bağlanarak).
 
 ## **YENİ GÜNCELLENEN MİMARİ YAPISSI**
 
 ### **Hybrid Data Architecture**
-- **XML API**: Ürün bilgileri (product.dart modeli ile 158 script)
+- **XML**: Ürün bilgileri (product.dart modeli ile 158 script)
 - **JSON Mock Server**: Kullanıcı, sipariş, favoriler ve tüm işlem verileri
 - **SharedPreferences**: Oturum persistance ve cache
 
 ### State Management
-MVVM mimarisi kullanılarak Provider pattern ile reactive state yönetimi gerçekleştiriliyor. **UserProvider artık gerçek HTTP istekleri** yaparak Mock API Server ile entegre çalışmaktadır. CartProvider minimal veri saklama prensibi ile sadece ürün ID'lerini saklayarak memory optimizasyonu yapıyor. Tüm veriler SharedPreferences ile kalıcı olarak saklanıyor.
+MVVM mimarisi kullanılarak Provider pattern ile reactive state yönetimi gerçekleştiriliyor. **UserProvider artık gerçek HTTP istekleri** yaparak Mock API Server ile entegre çalışmaktadır. Örnek: CartProvider minimal veri saklama prensibi ile sadece ürün ID'lerini saklayarak memory optimizasyonu yapıyor. Tüm veriler SharedPreferences ile kalıcı olarak saklanıyor.
 
 ### **YENİ - JSON Mock Server Entegrasyonu**
 Production-ready bir backend deneyimi sağlamak için **json-server** kullanılmaktadır. Bu yaklaşım:
@@ -82,7 +82,7 @@ Production-ready bir backend deneyimi sağlamak için **json-server** kullanılm
 - Gerçek zamanlı veri güncellemeleri
 - Production API'ye kolay geçiş imkanı sağlar
 
-### Navigation ve UI Mimarisi
+### Navigation ve UI Mimarisi(şuanda)
 3-tab navigation sistemi (Ana Sayfa, Ürünler, Profil) CustomBottomNavbar ile yönetiliyor. Sepet sistemi reusable CartModalWidget ile modal bottom sheet olarak açılıyor. Her iki ana sayfada (Home ve Products) AppBar'da sepet ikonu ve badge sistemi bulunuyor. IndexedStack kullanılarak tab değişimlerinde state preservation sağlanıyor.
 
 ### **YENİ - Güncellenmiş Veri Akışı ve Servisler**
@@ -112,14 +112,6 @@ JSON Mock Server ile iletişimi sağlayan kapsamlı HTTP servisi:
 - `addToFavorites(userId, scriptId)` - Favori ekle
 - `removeFromFavorites(userId, scriptId)` - Favori sil
 
-**Base URL Konfigürasyonu:**
-```dart
-// Development (Android Emulator)
-static const String baseUrl = 'http://10.0.2.2:3000';
-
-// Physical Device
-// static const String baseUrl = 'http://YOUR_IP:3000';
-```
 
 ### **Güncellenmiş AuthService (lib/services/auth_service.dart)**
 **BÜYÜK DEĞİŞİKLİK:** Asset-based mock veriler yerine Mock API Server kullanımı
@@ -163,14 +155,7 @@ Gerçek veritabanı şemasına uygun olarak tasarlanmış:
 }
 ```
 
-### **Server Başlatma**
-```bash
-# NPX ile (önerilen)
-npx json-server --watch db.json --port 3000
 
-# Global kurulum sonrası
-json-server --watch db.json --port 3000
-```
 
 ### **Otomatik REST Endpoints**
 ```
@@ -206,8 +191,9 @@ DELETE /favorites/1         # Favori sil
 - Minimal sepet sistemi (ID-based storage, KDV hesaplaması) (değişiklik yok)
 - 3-tab responsive tasarım ve state preservation (değişiklik yok)
 - Reusable widget'lar ile tutarlı UI deneyimi (değişiklik yok)
+- Ürünlerin favori ikonuna tıklayarak favorileme
 
-### **Favoriler Sistemi Altyapısı (Hazır)**
+### **Favoriler Sistemi Altyapısı (Hazır)** (yapıldı homescreen sadece şuan appbardaki ikondan favorilere gidiliyor)
 Mock API Server'da favorites tablosu mevcut ve MockApiService'te endpoint'ler hazır:
 - Database schema: user_id, script_id, created_at
 - CRUD operations: add, remove, list favorites
@@ -216,14 +202,6 @@ Mock API Server'da favorites tablosu mevcut ve MockApiService'te endpoint'ler ha
 ### Sepet Sistemi ve E-ticaret
 Sepet sistemi Set<int> veri yapısı ile sadece ürün ID'lerini saklayarak memory kullanımını optimize ediyor. Her ürün için toggle mantığı (ekle/çıkar) kullanılıyor. Yüzde 20 KDV hesaplaması otomatik olarak yapılıyor ve fiyat detayları (ara toplam, KDV, genel toplam) ayrı ayrı gösteriliyor. CartModalWidget ile tüm uygulamada tutarlı sepet deneyimi sunuluyor.
 
-## **GÜNCELLENEN TEKNİK DETAYLAR**
-
-### **Yeni Dependency'ler**
-```yaml
-dependencies:
-  http: ^1.1.0              # YENİ - HTTP istekleri için
-  # Diğerleri aynı...
-```
 
 ### **Provider Bağımlılıkları ve State Yönetimi**
 MultiProvider yapısı ile ProductProvider (158 ürün + filtreleme), **güncellenmiş UserProvider** (Mock API auth + profile) ve CartProvider (minimal sepet) merkezi olarak yönetiliyor. Consumer2 pattern'i ile CartProvider ve ProductProvider'ın birlikte kullanıldığı ekranlarda optimize edilmiş rendering sağlanıyor.
@@ -233,26 +211,6 @@ MultiProvider yapısı ile ProductProvider (158 ürün + filtreleme), **güncell
 - **TabloUyeler ve diğer tablo modelleri**: JSON Mock Server ile uyumlu
 - **MockApiService**: HTTP istekleri ile REST API simulation
 - **AuthService**: Production-ready authentication patterns
-
-### **Type Safety ve Error Handling**
-JSON Mock Server'ın bazen string ID üretmesi nedeniyle robust type casting uygulanmıştır:
-
-```dart
-// AuthService'te type safety
-if (createdUser['id'] is String) {
-  createdUser['id'] = DateTime.now().millisecondsSinceEpoch % 100000;
-}
-```
-
-## **GÜNCELLENECEK ALANLAR**
-
-### **Yakın Gelecek Özellikleri**
-1. **Favoriler UI implementasyonu** (backend hazır) - Provider + widget integration
-2. **Sipariş verme workflow'unun tamamlanması** - MockApiService ile orders tablosu kullanımı
-3. **Kullanıcı profil düzenleme sayfası** - MockApiService.updateUser kullanımı
-4. Push notification entegrasyonu
-5. Advanced search filters (fiyat aralığı, sıralama)
-6. Dark mode desteği
 
 ### **Uzun Vadeli İyileştirmeler**
 - **Real API transition**: JSON Mock Server'dan production API'ye geçiş (sadece URL değişikliği gerekli)
@@ -280,33 +238,11 @@ Sepet sistemi ID-based storage ile her ürün için sadece 4-8 byte kullanıyor.
 - Gerçek zamanlı sepet badge güncellemeleri ile instant feedback (değişiklik yok)
 - IndexedStack ile smooth tab navigation ve state preservation (değişiklik yok)
 
-## **DEVELOPMENT SETUP**
-
-### **JSON Mock Server Kurulumu**
-```bash
-# Node.js kurulu olması gerekli
-npm install -g json-server
-
-# Proje klasöründe
-npx json-server --watch db.json --port 3000
-
-# Windows PowerShell sorunları için
-npx json-server --watch db.json --port 3000
-```
-
-
-### **Test Endpoints**
-```bash
-# Browser'da test
-http://localhost:3000/uyeler
-http://localhost:3000/scriptler
-http://localhost:3000/favorites
-```
 
 ---
 
-**Son Güncelleme:** JSON Mock Server entegrasyonu ve gerçek HTTP authentication sistemi tamamlandı  
-**Toplam Dosya Sayısı:** 30+ dart dosyası + db.json + mock server configuration  
+**Son Güncelleme:** JSON Mock Server entegrasyonu ve gerçek HTTP authentication sistemi tamamlandı  , favoriler mantığı tamamlandı eksik uilar kaldı
+**Toplam Dosya Sayısı:** 32+ dart dosyası + db.json + mock server configuration  
 **Ana Özellikler:** **Real HTTP authentication**, ürün browsing, optimized cart system, responsive UI, **production-ready backend simulation**  
 **Mimari:** **Clean Architecture + HTTP Services**, Provider pattern, Widget-based modular design, **Mock-to-Production transition ready**
 

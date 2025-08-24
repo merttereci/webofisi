@@ -1,7 +1,7 @@
 {
   "uyeler": [
     {
-      "id": "1",
+      "id": 1,
       "fbid": 0,
       "hesap": 1,
       "vergi": 1,
@@ -40,7 +40,7 @@
       "ip": "127.0.0.1"
     },
     {
-      "id": "2",
+      "id": 2,
       "fbid": 0,
       "hesap": 1,
       "vergi": 1,
@@ -79,7 +79,7 @@
       "ip": "192.168.1.1"
     },
     {
-      "id": "3",
+      "id": 3,
       "fbid": 0,
       "hesap": 1,
       "vergi": 1,
@@ -118,7 +118,7 @@
       "ip": "212.156.45.78"
     },
     {
-      "id": "4",
+      "id": 4,
       "fbid": 0,
       "hesap": 1,
       "vergi": 0,
@@ -157,7 +157,7 @@
       "ip": "88.234.12.45"
     },
     {
-      "id": "5",
+      "id": 5,
       "fbid": 0,
       "hesap": 1,
       "vergi": 0,
@@ -196,7 +196,7 @@
       "ip": "78.180.45.123"
     },
     {
-      "id": "6",
+      "id": 6,
       "fbid": 0,
       "hesap": 1,
       "vergi": 1,
@@ -235,7 +235,7 @@
       "ip": "176.88.45.67"
     },
     {
-      "id": "7",
+      "id": 7,
       "fbid": 12345,
       "hesap": 1,
       "vergi": 0,
@@ -274,7 +274,7 @@
       "ip": "78.173.92.156"
     },
     {
-      "id": "8",
+      "id": 8,
       "fbid": 0,
       "hesap": 1,
       "vergi": 1,
@@ -313,7 +313,7 @@
       "ip": "127.0.0.1"
     },
     {
-      "id": "9",
+      "id": 9,
       "fbid": 0,
       "hesap": 1,
       "vergi": 1,
@@ -354,20 +354,13 @@
       "updated_at": "2025-08-22T22:05:02.858336"
     },
     {
-      "id": "1f91",
-      "ad": "BrowserTest",
-      "soyad": "User",
-      "email": "browser@test.com"
-    },
-    {
-      "id": "5123",
       "fbid": 0,
       "hesap": 1,
       "vergi": 1,
-      "ad": "emre",
-      "soyad": "tas",
-      "email": "emre@gmail.com",
-      "telefon": "05469898986",
+      "ad": "ali",
+      "soyad": "bekir",
+      "email": "ali@gmail.com",
+      "telefon": "05326559854",
       "sifre": "123456",
       "resim": "",
       "il": "",
@@ -388,22 +381,23 @@
       "cepkod": "",
       "emailonay": 1,
       "emailkod": "",
-      "son_giris": "2025-08-22 22:27:16.270068",
-      "tarih": "2025-08-22 22:27:16.272915",
+      "son_giris": "2025-08-24 22:17:10.202694",
+      "tarih": "2025-08-24 22:17:10.208437",
       "ay": "08",
-      "ktarih": "2025-08-22",
+      "ktarih": "2025-08-24",
       "parasutuyeid": 0,
       "vatandas": 1,
       "vip": 0,
       "mnot": "",
       "ip": "127.0.0.1",
-      "created_at": "2025-08-22T22:27:16.273145",
-      "updated_at": "2025-08-22T22:27:16.273694"
+      "created_at": "2025-08-24T22:17:10.209214",
+      "updated_at": "2025-08-24T22:17:10.211741",
+      "id": 10
     }
   ],
   "kategoriler": [
     {
-      "id": "1",
+      "id": 1,
       "adi": "E-Ticaret",
       "title": "E-Ticaret Scriptleri",
       "seo": "e-ticaret-scriptleri",
@@ -415,7 +409,7 @@
       "tarih": "2024-01-01 10:00:00"
     },
     {
-      "id": "2",
+      "id": 2,
       "adi": "Blog",
       "title": "Blog Scriptleri",
       "seo": "blog-scriptleri",
@@ -427,7 +421,7 @@
       "tarih": "2024-01-01 10:00:00"
     },
     {
-      "id": "3",
+      "id": 3,
       "adi": "Forum",
       "title": "Forum Scriptleri",
       "seo": "forum-scriptleri",
@@ -441,7 +435,7 @@
   ],
   "scriptler": [
     {
-      "id": "1",
+      "id": 1,
       "kategoriler": "1",
       "adi": "Modern E-Ticaret Sistemi",
       "url": "modern-eticaret-sistemi",
@@ -472,7 +466,7 @@
       "genis": 1
     },
     {
-      "id": "5",
+      "id": 5,
       "kategoriler": "2",
       "adi": "Blog CMS Sistemi",
       "url": "blog-cms-sistemi",
@@ -503,7 +497,7 @@
       "genis": 0
     },
     {
-      "id": "12",
+      "id": 12,
       "kategoriler": "3",
       "adi": "Forum Scripti Pro",
       "url": "forum-scripti-pro",
@@ -536,7 +530,7 @@
   ],
   "siparisler": [
     {
-      "id": "1",
+      "id": 1,
       "uyeid": 1,
       "scriptid": 1,
       "ad": "Ahmet",
@@ -588,69 +582,45 @@
   ],
   "favorites": [
     {
-      "id": "1",
+      "id": 1,
       "user_id": 1,
       "script_id": 5,
       "created_at": "2024-08-20T14:30:00Z"
     },
     {
-      "id": "2",
+      "id": 2,
       "user_id": 1,
       "script_id": 12,
       "created_at": "2024-08-21T09:15:00Z"
     },
     {
-      "id": "3",
+      "id": 3,
       "user_id": 2,
       "script_id": 1,
       "created_at": "2024-08-21T16:20:00Z"
     },
     {
-      "id": "4",
-      "user_id": 1,
-      "script_id": 1,
-      "created_at": "2025-08-22T21:06:21.085779"
+      "user_id": 6,
+      "script_id": 163,
+      "created_at": "2025-08-24T22:35:49.477694",
+      "id": 6
     },
     {
-      "id": "5",
-      "user_id": 1,
-      "script_id": 1,
-      "created_at": "2025-08-22T21:20:23.457620"
+      "user_id": 6,
+      "script_id": 164,
+      "created_at": "2025-08-24T22:35:50.451734",
+      "id": 7
     },
     {
-      "id": "6",
-      "user_id": 1,
-      "script_id": 1,
-      "created_at": "2025-08-22T21:20:38.471312"
-    },
-    {
-      "id": "7",
-      "user_id": 1,
-      "script_id": 1,
-      "created_at": "2025-08-22T21:21:47.199272"
-    },
-    {
-      "id": "8",
-      "user_id": 1,
-      "script_id": 1,
-      "created_at": "2025-08-22T21:24:18.327388"
-    },
-    {
-      "id": "9",
-      "user_id": 1,
-      "script_id": 1,
-      "created_at": "2025-08-22T21:25:30.005191"
-    },
-    {
-      "id": "10",
-      "user_id": 1,
-      "script_id": 1,
-      "created_at": "2025-08-22T21:35:49.393160"
+      "user_id": 6,
+      "script_id": 162,
+      "created_at": "2025-08-24T22:35:52.016267",
+      "id": 8
     }
   ],
   "krediler": [
     {
-      "id": "1",
+      "id": 1,
       "uyeid": 1,
       "tutar": "500.00",
       "paytronay": 1,
@@ -662,7 +632,7 @@
   ],
   "destek": [
     {
-      "id": "1",
+      "id": 1,
       "uye_id": 1,
       "isim": "Ahmet Yılmaz",
       "email": "ahmet@test.com",
@@ -688,7 +658,7 @@
   ],
   "destek_cevaplar": [
     {
-      "id": "1",
+      "id": 1,
       "yetkili": 1,
       "destek_id": 1,
       "mesaj": "Merhabalar, kurulum ile ilgili size yardımcı olacağım.",
@@ -699,7 +669,7 @@
   ],
   "indirim_kuponlari": [
     {
-      "id": "1",
+      "id": 1,
       "kod": "WELCOME10",
       "indirim": "10",
       "durum": 1,
@@ -709,7 +679,7 @@
   ],
   "banka_hesaplari": [
     {
-      "id": "1",
+      "id": 1,
       "banka": "Ziraat Bankası",
       "hesap": "Web Ofisi Ltd Şti",
       "sube": "Kadıköy Şubesi",
@@ -722,7 +692,7 @@
   ],
   "slider": [
     {
-      "id": "1",
+      "id": 1,
       "sira": 1,
       "adi": "Yeni Scriptler",
       "resim": "slider1.jpg",
