@@ -1,9 +1,12 @@
 // lib/screens/product_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:web_ofisi_mobile/screens/favorites_screen.dart';
 import '../providers/product_provider.dart';
 import '../providers/cart_provider.dart'; // YENİ IMPORT
 import '../widgets/cart_modal_widget.dart'; // YENİ IMPORT
+import '../providers/favorites_provider.dart'; // YENİ IMPORT
+import '../providers/user_provider.dart'; // YENİ IMPORT
 import '../widgets/product_lists_widgets/compact_search_widget.dart';
 import '../widgets/product_lists_widgets/product_card.dart';
 import '../widgets/product_lists_widgets/pagination_widget.dart';
@@ -31,6 +34,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _productProvider.loadProducts();
+
+      // YENİ: Login olan kullanıcı için favorileri de yükle
+      final userProvider = context.read<UserProvider>();
+      if (userProvider.isLoggedIn && userProvider.currentUser != null) {
+        context
+            .read<FavoritesProvider>()
+            .loadFavorites(userProvider.currentUser!.id);
+      }
     });
     _productProvider.addListener(_scrollToTopOnStateChange);
   }
@@ -127,6 +138,58 @@ class _ProductListScreenState extends State<ProductListScreen> {
             },
           ),
           const SizedBox(width: 8),
+
+          // YENİ: Favoriler ikonu
+          Consumer2<FavoritesProvider, UserProvider>(
+            builder: (context, favoritesProvider, userProvider, child) {
+              return IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FavoritesScreen(),
+                    ),
+                  );
+                },
+                icon: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(
+                      Icons.favorite,
+                      color: Colors.grey[700],
+                      size: 24,
+                    ),
+                    if (userProvider.isLoggedIn &&
+                        favoritesProvider.favoriteCount > 0)
+                      Positioned(
+                        right: -6,
+                        top: -4,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 14,
+                            minHeight: 14,
+                          ),
+                          child: Text(
+                            '${favoritesProvider.favoriteCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: SafeArea(

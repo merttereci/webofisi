@@ -393,6 +393,47 @@
       "created_at": "2025-08-24T22:17:10.209214",
       "updated_at": "2025-08-24T22:17:10.211741",
       "id": 10
+    },
+    {
+      "fbid": 0,
+      "hesap": 1,
+      "vergi": 1,
+      "ad": "elif",
+      "soyad": "su",
+      "email": "elif@gmail.com",
+      "telefon": "05362698855",
+      "sifre": "123456",
+      "resim": "",
+      "il": "",
+      "ilce": "",
+      "adres": "",
+      "tc": "",
+      "firmaadi": "",
+      "vergino": "",
+      "vergidairesi": "",
+      "firma_tel": "",
+      "firma_adres": "",
+      "kampanya_eposta": 1,
+      "kampanya_sms": 0,
+      "indirim": "0",
+      "statu": 0,
+      "durum": 1,
+      "ceponay": 0,
+      "cepkod": "",
+      "emailonay": 1,
+      "emailkod": "",
+      "son_giris": "2025-08-25 19:15:13.210242",
+      "tarih": "2025-08-25 19:15:13.218429",
+      "ay": "08",
+      "ktarih": "2025-08-25",
+      "parasutuyeid": 0,
+      "vatandas": 1,
+      "vip": 0,
+      "mnot": "",
+      "ip": "127.0.0.1",
+      "created_at": "2025-08-25T19:15:13.218809",
+      "updated_at": "2025-08-25T19:15:13.219114",
+      "id": 11
     }
   ],
   "kategoriler": [
@@ -598,24 +639,6 @@
       "user_id": 2,
       "script_id": 1,
       "created_at": "2024-08-21T16:20:00Z"
-    },
-    {
-      "user_id": 6,
-      "script_id": 163,
-      "created_at": "2025-08-24T22:35:49.477694",
-      "id": 6
-    },
-    {
-      "user_id": 6,
-      "script_id": 164,
-      "created_at": "2025-08-24T22:35:50.451734",
-      "id": 7
-    },
-    {
-      "user_id": 6,
-      "script_id": 162,
-      "created_at": "2025-08-24T22:35:52.016267",
-      "id": 8
     }
   ],
   "krediler": [

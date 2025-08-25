@@ -1,4 +1,10 @@
-# Güncel Proje Yapısı
+# Web Ofisi Mobile - Flutter E-Ticaret Uygulaması
+
+Kurumsal web yazılımları satışı için geliştirilmiş Flutter e-ticaret uygulaması. 158 adet hazır web scripti listeleyen, kullanıcı kayıt/giriş sistemi olan, favoriler ve sepet özellikli modern mobil uygulama.
+
+## Proje Açıklaması
+
+Web Ofisi Mobile, kurumsal web yazılımları satışı için geliştirilmiş modern bir Flutter e-ticaret uygulamasıdir. **İki farklı veri kaynağı** kullanarak hybrid bir yaklaşım benimser: XML den 158 adet hazır web scripti çekerken(ürünler), kullanıcı verilerini JSON Mock Server üzerinden yönetir (gelecekte API üzerinden veritabanına bağlanarak).
 
 ## Dizin Yapısı
 ```
@@ -17,7 +23,8 @@ lib/
 │   │   ├── siparisler.dart            # Siparişler modeli
 │   │   ├── slider.dart                # Slider modeli
 │   │   └── uyeler.dart                # Üyeler modeli
-│   └── product.dart                    # Ana ürün modeli (XML verisi)
+│   ├── product.dart                    # Ana ürün modeli (XML verisi)
+|   └── register_form_data.dart
 ├── providers/                          # State Management (Provider)
 │   ├── cart_provider.dart             # Sepet state yönetimi (minimal ID-based)
 │   ├── product_provider.dart          # Ürün state yönetimi
@@ -51,19 +58,21 @@ lib/
     │   ├── product_detail_row.dart    # Detay satırları
     │   └── product_image_gallery.dart # Görsel galerisi
     └── product_lists_widgets/         # Ürün listesi widget'ları
-        ├── category_selector_modal.dart # Kategori seçici modal
-        ├── compact_search_widget.dart # Kompakt arama + kategori widget
-        ├── error_widget.dart          # Hata widget'ı
-        ├── loading_widget.dart        # Yükleme widget'ı
-        ├── pagination_widget.dart     # Sayfalama widget'ı
-        ├── product_card.dart          # Ana ürün kartı (ürünler sayfası)
+    │   ├── category_selector_modal.dart # Kategori seçici modal
+    │   ├── compact_search_widget.dart # Kompakt arama + kategori widget
+    │   ├── error_widget.dart          # Hata widget'ı
+    │   ├── loading_widget.dart        # Yükleme widget'ı
+    │   ├── pagination_widget.dart     # Sayfalama widget'ı
+    │   ├── product_card.dart          # Ana ürün kartı (ürünler sayfası)
+    ├── auth_steps/
+    │   ├── step1_account_type.dart
+    │   ├── step2_personal_info.dart
+
 
 └── db.json                            # **YENİ** - JSON Mock Server veritabanı
 ```
 
-## Proje Açıklaması
 
-Web Ofisi Mobile, kurumsal web yazılımları satışı için geliştirilmiş modern bir Flutter e-ticaret uygulamasıdir. **İki farklı veri kaynağı** kullanarak hybrid bir yaklaşım benimser: XML den 158 adet hazır web scripti çekerken(ürünler), kullanıcı verilerini JSON Mock Server üzerinden yönetir (gelecekte API üzerinden veritabanına bağlanarak).
 
 ## **YENİ GÜNCELLENEN MİMARİ YAPISSI**
 
@@ -193,18 +202,27 @@ DELETE /favorites/1         # Favori sil
 - Reusable widget'lar ile tutarlı UI deneyimi (değişiklik yok)
 - Ürünlerin favori ikonuna tıklayarak favorileme
 
-### **Favoriler Sistemi Altyapısı (Hazır)** (yapıldı homescreen sadece şuan appbardaki ikondan favorilere gidiliyor)
+### Temel Akış
+
+- Uygulama açılır: AuthWrapper kullanıcı giriş kontrolü yapar
+- Ana sayfa: Flash kartlar + XML'den ilk 6 ürün horizontal scroll
+- Ürünler sayfası: Tüm ürünler, arama, kategori filtreleme, sayfalama
+- Favoriler: Login gerekli, Mock API ile gerçek HTTP CRUD
+- Sepet: Sayfa olarak açılır, KDV hesaplama, ürün toggle
+
+### **Favoriler Sistemi Altyapısı 
 Mock API Server'da favorites tablosu mevcut ve MockApiService'te endpoint'ler hazır:
 - Database schema: user_id, script_id, created_at
 - CRUD operations: add, remove, list favorites
 - Real-time data synchronization
+- UI done
 
 ### Sepet Sistemi ve E-ticaret
 Sepet sistemi Set<int> veri yapısı ile sadece ürün ID'lerini saklayarak memory kullanımını optimize ediyor. Her ürün için toggle mantığı (ekle/çıkar) kullanılıyor. Yüzde 20 KDV hesaplaması otomatik olarak yapılıyor ve fiyat detayları (ara toplam, KDV, genel toplam) ayrı ayrı gösteriliyor. CartModalWidget ile tüm uygulamada tutarlı sepet deneyimi sunuluyor.
 
 
 ### **Provider Bağımlılıkları ve State Yönetimi**
-MultiProvider yapısı ile ProductProvider (158 ürün + filtreleme), **güncellenmiş UserProvider** (Mock API auth + profile) ve CartProvider (minimal sepet) merkezi olarak yönetiliyor. Consumer2 pattern'i ile CartProvider ve ProductProvider'ın birlikte kullanıldığı ekranlarda optimize edilmiş rendering sağlanıyor.
+MultiProvider yapısı ile ProductProvider (158 ürün + filtreleme), **güncellenmiş UserProvider** (Mock API auth + profile) ve CartProvider (minimal sepet) merkezi olarak yönetiliyor. FavoritesProvider: Mock API, real-time sync ve Consumer2 pattern'i ile CartProvider ve ProductProvider'ın birlikte kullanıldığı ekranlarda optimize edilmiş rendering sağlanıyor.
 
 ### **Yeni Veri Modelleri ve Optimizasyon**
 - **Product.dart**: XML parsing ile 158 ürünü yönetiyor (değişiklik yok)
@@ -241,7 +259,7 @@ Sepet sistemi ID-based storage ile her ürün için sadece 4-8 byte kullanıyor.
 
 ---
 
-**Son Güncelleme:** JSON Mock Server entegrasyonu ve gerçek HTTP authentication sistemi tamamlandı  , favoriler mantığı tamamlandı eksik uilar kaldı
+**Son Güncelleme:** JSON Mock Server entegrasyonu ve gerçek HTTP authentication sistemi tamamlandı  , favoriler mantığı tamamlandı, uilar da tamamlandı
 **Toplam Dosya Sayısı:** 32+ dart dosyası + db.json + mock server configuration  
 **Ana Özellikler:** **Real HTTP authentication**, ürün browsing, optimized cart system, responsive UI, **production-ready backend simulation**  
 **Mimari:** **Clean Architecture + HTTP Services**, Provider pattern, Widget-based modular design, **Mock-to-Production transition ready**
@@ -265,3 +283,4 @@ static const String baseUrl = 'https://yourdomain.com/api';
 ```
 
 Kod değişikliği **minimum** düzeyde kalacaktır.
+

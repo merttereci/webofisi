@@ -3,11 +3,60 @@ import 'package:provider/provider.dart';
 import '../../models/product.dart';
 import '../../screens/product_detail_screen.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/favorites_provider.dart';
+import '../../providers/user_provider.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
 
   const ProductCard({Key? key, required this.product}) : super(key: key);
+
+  // Favori toggle fonksiyonu
+  void _toggleFavorite(BuildContext context) async {
+    final userProvider = context.read<UserProvider>();
+    final favoritesProvider = context.read<FavoritesProvider>();
+
+    // Kullanıcı giriş yapmış mı kontrol et
+    if (!userProvider.isLoggedIn || userProvider.currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Favorilere eklemek için giriş yapmalısınız'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Favori toggle işlemi
+    final success = await favoritesProvider.toggleFavorite(
+      userProvider.currentUser!.id,
+      product.id,
+    );
+
+    if (success) {
+      final isFavorite = favoritesProvider.isFavorite(product.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isFavorite
+                ? '${product.name} favorilere eklendi'
+                : '${product.name} favorilerden çıkarıldı',
+          ),
+          backgroundColor: isFavorite ? Colors.green : Colors.orange,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Favori güncellenirken hata oluştu'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,12 +87,12 @@ class ProductCard extends StatelessWidget {
               );
             },
             child: Padding(
-              padding: EdgeInsets.all(14), // 16'dan 14'e düşürüldü
+              padding: EdgeInsets.all(14),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildProductImage(),
-                  SizedBox(width: 14), // 16'dan 14'e düşürüldü
+                  SizedBox(width: 14),
                   Expanded(child: _buildProductInfo()),
                 ],
               ),
@@ -55,11 +104,12 @@ class ProductCard extends StatelessWidget {
   }
 
   Widget _buildProductImage() {
+    // TEMİZ GÖRSEL - Üzerinde hiçbir buton yok
     return ClipRRect(
-      borderRadius: BorderRadius.circular(10), // 12'den 10'a düşürüldü
+      borderRadius: BorderRadius.circular(10),
       child: Container(
-        width: 70, // 80'den 70'e düşürüldü
-        height: 70, // 80'den 70'e düşürüldü
+        width: 70,
+        height: 70,
         color: Colors.grey[100],
         child: product.image.isNotEmpty
             ? Image.network(
@@ -84,7 +134,7 @@ class ProductCard extends StatelessWidget {
                     child: Icon(
                       Icons.image_not_supported,
                       color: Colors.grey[400],
-                      size: 28, // 32'den 28'e düşürüldü
+                      size: 28,
                     ),
                   );
                 },
@@ -93,7 +143,7 @@ class ProductCard extends StatelessWidget {
                 child: Icon(
                   Icons.web,
                   color: Colors.grey[400],
-                  size: 28, // 32'den 28'e düşürüldü
+                  size: 28,
                 ),
               ),
       ),
@@ -117,27 +167,26 @@ class ProductCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
 
-        SizedBox(height: 6), // 8'den 6'ya düşürüldü
+        SizedBox(height: 6),
 
         // Kodlama
         Container(
-          padding: EdgeInsets.symmetric(
-              horizontal: 6, vertical: 3), // Padding küçültüldü
+          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 3),
           decoration: BoxDecoration(
             color: Colors.blue[50],
-            borderRadius: BorderRadius.circular(5), // 6'dan 5'e düşürüldü
+            borderRadius: BorderRadius.circular(5),
           ),
           child: Text(
             product.coding,
             style: TextStyle(
-              fontSize: 11, // 12'den 11'e düşürüldü
+              fontSize: 11,
               color: Colors.blue[700],
               fontWeight: FontWeight.w500,
             ),
           ),
         ),
 
-        SizedBox(height: 6), // 8'den 6'ya düşürüldü
+        SizedBox(height: 6),
 
         // Kategori(ler)
         Text(
@@ -153,23 +202,52 @@ class ProductCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
 
-        SizedBox(height: 10), // 12'den 10'a düşürüldü
+        SizedBox(height: 12),
 
-        // Fiyat ve Sepet Butonu
+        // YENİ: ÜÇLÜ ALT DÜZEN [Fiyat] [❤️] [🛒]
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Fiyat (Sol)
-            Text(
-              '${product.price.toStringAsFixed(0)} ${product.priceUnit}',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.green[600],
+            // 1. FIYAT (Sol)
+            Expanded(
+              flex: 2,
+              child: Text(
+                '${product.price.toStringAsFixed(0)} ${product.priceUnit}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green[600],
+                ),
               ),
             ),
 
-            // Sepet Butonu (Sağ) - Daha şık ve küçük
+            SizedBox(width: 8),
+
+            // 2. FAVORİ BUTONU (Orta) - Basit Kalp
+            Consumer2<FavoritesProvider, UserProvider>(
+              builder: (context, favoritesProvider, userProvider, child) {
+                final isFavorite = favoritesProvider.isFavorite(product.id);
+
+                return GestureDetector(
+                  onTap: () => _toggleFavorite(context),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.red : Colors.grey[600],
+                      size: 20,
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            SizedBox(width: 8),
+
+            // 3. SEPET BUTONU (Sağ)
             Consumer<CartProvider>(
               builder: (context, cartProvider, child) {
                 final isInCart = cartProvider.isInCart(product.id);
@@ -179,11 +257,11 @@ class ProductCard extends StatelessWidget {
                     cartProvider.toggleCart(product.id);
                   },
                   child: Container(
-                    width: 32,
-                    height: 32,
+                    width: 36,
+                    height: 36,
                     decoration: BoxDecoration(
                       color: isInCart ? Colors.green[600] : Colors.blue[600],
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
                           color: (isInCart
@@ -197,7 +275,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     child: Icon(
                       isInCart ? Icons.check : Icons.shopping_cart,
-                      size: 16,
+                      size: 18,
                       color: Colors.white,
                     ),
                   ),

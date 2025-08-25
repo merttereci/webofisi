@@ -35,7 +35,7 @@ class TabloUyeler {
   final int? parasutuyeid; //default 0
   final int?
       vatandas; //normalde zorunlu ama default değer de istiyor , default 0
-  final int? vip;
+  final int? vip; //default 0
   final String? mnot;
   final String? ip;
 
