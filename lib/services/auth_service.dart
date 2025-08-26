@@ -80,23 +80,23 @@ class AuthService {
         'telefon': newUser.telefon,
         'sifre': newUser.sifre,
         'resim': '',
-        'il': '',
-        'ilce': '',
-        'adres': '',
-        'tc': '',
-        'firmaadi': '',
-        'vergino': '',
-        'vergidairesi': '',
+        'il': newUser.il ?? '', // newUser'dan al
+        'ilce': newUser.ilce ?? '', // newUser'dan al
+        'adres': newUser.adres ?? '', // newUser'dan al
+        'tc': newUser.tc ?? '', // newUser'dan al
+        'firmaadi': newUser.firmaadi ?? '',
+        'vergino': newUser.vergino ?? '',
+        'vergidairesi': newUser.vergidairesi ?? '',
         'firma_tel': '',
         'firma_adres': '',
-        'kampanya_eposta': 1,
-        'kampanya_sms': 0,
+        'kampanya_eposta': newUser.kampanya_eposta ?? 0, // user tercihini al
+        'kampanya_sms': newUser.kampanya_sms ?? 0,
         'indirim': '0',
         'statu': 0,
         'durum': 1,
         'ceponay': 0,
         'cepkod': '',
-        'emailonay': 1,
+        'emailonay': 0,
         'emailkod': '',
         'son_giris': DateTime.now().toString(),
         'tarih': DateTime.now().toString(),

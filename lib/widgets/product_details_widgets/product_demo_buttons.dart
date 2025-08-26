@@ -50,8 +50,7 @@ class ProductDemoButtons extends StatelessWidget {
             onPressed: () =>
                 _launchURL(context, demoUrl), // Link açma işlevini çağırdık
             icon: const Icon(Icons.open_in_new, size: 20),
-            label:
-                const Text('Demoyu Görüntüle', style: TextStyle(fontSize: 14)),
+            label: const Text('Demo Site', style: TextStyle(fontSize: 14)),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue[600],
               foregroundColor: Colors.white,
@@ -73,8 +72,8 @@ class ProductDemoButtons extends StatelessWidget {
             onPressed: () => _launchURL(
                 context, adminDemoUrl), // Link açma işlevini çağırdık
             icon: const Icon(Icons.admin_panel_settings, size: 20),
-            label: const Text('Admin Demoyu Görüntüle',
-                style: TextStyle(fontSize: 14)),
+            label:
+                const Text('Admin Demo Site', style: TextStyle(fontSize: 14)),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.deepPurple[600],
               foregroundColor: Colors.white,

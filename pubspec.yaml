@@ -73,6 +73,7 @@ flutter:
   assets:
     - assets/logo/logo.png
     - assets/launcher/icon.png
+    - assets/data/cities.json
    
 
 

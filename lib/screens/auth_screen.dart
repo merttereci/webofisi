@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/tables/uyeler.dart';
 import '../providers/user_provider.dart';
+import 'scrollable_register_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({Key? key}) : super(key: key);
@@ -13,26 +13,12 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen>
     with SingleTickerProviderStateMixin {
   final _loginFormKey = GlobalKey<FormState>();
-  final _registerFormKey = GlobalKey<FormState>();
 
   final TextEditingController _loginEmailController = TextEditingController();
   final TextEditingController _loginPasswordController =
       TextEditingController();
-  final TextEditingController _registerNameController = TextEditingController();
-  final TextEditingController _registerSurnameController =
-      TextEditingController();
-  final TextEditingController _registerEmailController =
-      TextEditingController();
-  final TextEditingController _registerPhoneController =
-      TextEditingController();
-  final TextEditingController _registerPasswordController =
-      TextEditingController();
-  final TextEditingController _registerConfirmPasswordController =
-      TextEditingController();
 
-  bool _isLogin = true;
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -74,12 +60,6 @@ class _AuthScreenState extends State<AuthScreen>
     _animationController.dispose();
     _loginEmailController.dispose();
     _loginPasswordController.dispose();
-    _registerNameController.dispose();
-    _registerSurnameController.dispose();
-    _registerEmailController.dispose();
-    _registerPhoneController.dispose();
-    _registerPasswordController.dispose();
-    _registerConfirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -96,45 +76,18 @@ class _AuthScreenState extends State<AuthScreen>
         _showSnackBar(
             'Giriş başarılı! Hoş geldiniz ${userProvider.userFullName}!',
             isError: false);
-        // Navigation AuthWrapper tarafından otomatik yapılacak
       } else {
         _showSnackBar('Geçersiz e-posta veya şifre.');
       }
     }
   }
 
-  void _register() async {
-    if (_registerFormKey.currentState!.validate()) {
-      // Şifre eşleşme kontrolü
-      if (_registerPasswordController.text !=
-          _registerConfirmPasswordController.text) {
-        _showSnackBar('Şifreler eşleşmiyor.');
-        return;
-      }
-
-      final newUser = TabloUyeler(
-        id: 0, // ID AuthService tarafından atanacak
-        ad: _registerNameController.text,
-        soyad: _registerSurnameController.text,
-        email: _registerEmailController.text,
-        sifre: _registerPasswordController.text,
-        telefon: _registerPhoneController.text,
-        statu: 0, // Yeni kullanıcı
-        durum: 1, // Aktif
-      );
-
-      final userProvider = context.read<UserProvider>();
-      final result = await userProvider.register(newUser);
-
-      if (result['success']) {
-        _showSnackBar(
-            'Kayıt başarılı! Hoş geldiniz ${userProvider.userFullName}!',
-            isError: false);
-        // Navigation AuthWrapper tarafından otomatik yapılacak
-      } else {
-        _showSnackBar(result['message'] ?? 'Kayıt işlemi başarısız.');
-      }
-    }
+  void _navigateToRegister() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const ScrollableRegisterScreen(),
+      ),
+    );
   }
 
   void _showSnackBar(String message, {bool isError = true}) {
@@ -178,7 +131,7 @@ class _AuthScreenState extends State<AuthScreen>
                     children: [
                       _buildLogo(),
                       const SizedBox(height: 32),
-                      _buildAuthCard(),
+                      _buildLoginCard(),
                     ],
                   ),
                 ),
@@ -203,7 +156,7 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
-  Widget _buildAuthCard() {
+  Widget _buildLoginCard() {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -222,12 +175,15 @@ class _AuthScreenState extends State<AuthScreen>
         child: Column(
           children: [
             _buildHeader(),
-            const SizedBox(height: 32),
-            _buildAuthForm(),
             const SizedBox(height: 24),
-            _buildActionButton(),
-            const SizedBox(height: 24),
-            _buildToggleButton(),
+            _buildLoginForm(),
+            const SizedBox(height: 20),
+            _buildLoginButton(),
+            const SizedBox(height: 8),
+            _buildForgotPassword(),
+            _buildDivider(),
+            const SizedBox(height: 16),
+            _buildRegisterButton(),
           ],
         ),
       ),
@@ -237,9 +193,9 @@ class _AuthScreenState extends State<AuthScreen>
   Widget _buildHeader() {
     return Column(
       children: [
-        Text(
-          _isLogin ? 'Tekrar Hoş Geldiniz!' : 'Hesap Oluşturun',
-          style: const TextStyle(
+        const Text(
+          'Tekrar Hoş Geldiniz!',
+          style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
             color: Color(0xFF2D3748),
@@ -248,9 +204,7 @@ class _AuthScreenState extends State<AuthScreen>
         ),
         const SizedBox(height: 8),
         Text(
-          _isLogin
-              ? 'Hesabınıza giriş yaparak devam edin'
-              : 'Yeni hesap oluşturarak başlayın',
+          'Hesabınıza giriş yaparak devam edin',
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey[600],
@@ -258,13 +212,6 @@ class _AuthScreenState extends State<AuthScreen>
           textAlign: TextAlign.center,
         ),
       ],
-    );
-  }
-
-  Widget _buildAuthForm() {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      child: _isLogin ? _buildLoginForm() : _buildRegisterForm(),
     );
   }
 
@@ -293,100 +240,6 @@ class _AuthScreenState extends State<AuthScreen>
             },
             validator: (value) =>
                 value!.isEmpty ? 'Şifre boş bırakılamaz' : null,
-          ),
-          const SizedBox(height: 12),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                // Şifremi unuttum fonksiyonu - ileride implement edilebilir
-                _showSnackBar('Şifre sıfırlama özelliği henüz aktif değil.',
-                    isError: false);
-              },
-              child: Text(
-                'Şifremi Unuttum?',
-                style: TextStyle(
-                  color: const Color(0xFF667eea),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRegisterForm() {
-    return Form(
-      key: _registerFormKey,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildModernTextField(
-                  controller: _registerNameController,
-                  label: 'Ad',
-                  icon: Icons.person_outline,
-                  validator: (value) => value!.isEmpty ? 'Ad gerekli' : null,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildModernTextField(
-                  controller: _registerSurnameController,
-                  label: 'Soyad',
-                  icon: Icons.person_outline,
-                  validator: (value) => value!.isEmpty ? 'Soyad gerekli' : null,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _buildModernTextField(
-            controller: _registerEmailController,
-            label: 'E-posta Adresi',
-            icon: Icons.email_outlined,
-            validator: (value) => value!.isEmpty || !value.contains('@')
-                ? 'Geçerli bir e-posta girin'
-                : null,
-          ),
-          const SizedBox(height: 20),
-          _buildModernTextField(
-            controller: _registerPhoneController,
-            label: 'Telefon Numarası',
-            icon: Icons.phone_outlined,
-            validator: (value) =>
-                value!.isEmpty ? 'Telefon numarası gerekli' : null,
-          ),
-          const SizedBox(height: 20),
-          _buildModernTextField(
-            controller: _registerPasswordController,
-            label: 'Şifre',
-            icon: Icons.lock_outline,
-            isPassword: true,
-            obscureText: _obscurePassword,
-            onToggleVisibility: () {
-              setState(() => _obscurePassword = !_obscurePassword);
-            },
-            validator: (value) =>
-                value!.length < 6 ? 'Şifre en az 6 karakter olmalı' : null,
-          ),
-          const SizedBox(height: 20),
-          _buildModernTextField(
-            controller: _registerConfirmPasswordController,
-            label: 'Şifre Tekrar',
-            icon: Icons.lock_outline,
-            isPassword: true,
-            obscureText: _obscureConfirmPassword,
-            onToggleVisibility: () {
-              setState(
-                  () => _obscureConfirmPassword = !_obscureConfirmPassword);
-            },
-            validator: (value) => value != _registerPasswordController.text
-                ? 'Şifreler eşleşmiyor'
-                : null,
           ),
         ],
       ),
@@ -461,7 +314,7 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
-  Widget _buildActionButton() {
+  Widget _buildLoginButton() {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         return Container(
@@ -481,8 +334,7 @@ class _AuthScreenState extends State<AuthScreen>
             ],
           ),
           child: ElevatedButton(
-            onPressed:
-                userProvider.isLoading ? null : (_isLogin ? _login : _register),
+            onPressed: userProvider.isLoading ? null : _login,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
@@ -499,9 +351,9 @@ class _AuthScreenState extends State<AuthScreen>
                       strokeWidth: 2,
                     ),
                   )
-                : Text(
-                    _isLogin ? 'Giriş Yap' : 'Hesap Oluştur',
-                    style: const TextStyle(
+                : const Text(
+                    'Giriş Yap',
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -513,46 +365,67 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
-  Widget _buildToggleButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          _isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?',
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 15,
-          ),
+  Widget _buildForgotPassword() {
+    return TextButton(
+      onPressed: () {
+        _showSnackBar('Şifre sıfırlama özelliği henüz aktif değil.',
+            isError: false);
+      },
+      child: const Text(
+        'Şifremi Unuttum?',
+        style: TextStyle(
+          color: Color(0xFF667eea),
+          fontWeight: FontWeight.w600,
         ),
-        TextButton(
-          onPressed: () {
-            setState(() {
-              _isLogin = !_isLogin;
-              // Form değiştirirken controller'ları temizle
-              _clearFormFields();
-            });
-          },
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Row(
+      children: [
+        Expanded(child: Divider(color: Colors.grey[300])),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            _isLogin ? 'Kayıt Olun' : 'Giriş Yapın',
-            style: const TextStyle(
-              color: Color(0xFF667eea),
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
+            'veya',
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 14,
             ),
           ),
         ),
+        Expanded(child: Divider(color: Colors.grey[300])),
       ],
     );
   }
 
-  void _clearFormFields() {
-    _loginEmailController.clear();
-    _loginPasswordController.clear();
-    _registerNameController.clear();
-    _registerSurnameController.clear();
-    _registerEmailController.clear();
-    _registerPhoneController.clear();
-    _registerPasswordController.clear();
-    _registerConfirmPasswordController.clear();
+  Widget _buildRegisterButton() {
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF667eea), width: 2),
+      ),
+      child: ElevatedButton(
+        onPressed: _navigateToRegister,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: const Text(
+          'Hesap Oluştur',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF667eea),
+          ),
+        ),
+      ),
+    );
   }
 }
