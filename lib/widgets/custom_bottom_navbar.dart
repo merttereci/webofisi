@@ -52,6 +52,11 @@ class CustomBottomNavbar extends StatelessWidget {
             label: 'Ürünler',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.dns_outlined),
+            activeIcon: Icon(Icons.dns),
+            label: 'Hosting',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             activeIcon: Icon(Icons.person),
             label: 'Profil',

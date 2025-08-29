@@ -24,7 +24,7 @@ lib/
 │   │   ├── slider.dart                # Slider modeli
 │   │   └── uyeler.dart                # Üyeler modeli
 │   ├── product.dart                    # Ana ürün modeli (XML verisi)
-|   └── register_form_data.dart
+│   └── register_form_data.dart
 ├── providers/                          # State Management (Provider)
 │   ├── cart_provider.dart             # Sepet state yönetimi (minimal ID-based)
 │   ├── product_provider.dart          # Ürün state yönetimi
@@ -34,22 +34,25 @@ lib/
 │   ├── tabs/                          # Tab ekranları
 │   │   ├── home_tab.dart              # Ana sayfa tab
 │   │   ├── products_tab.dart          # Ürünler tab
+│   │   ├── hosting_tab.dart           # **YENİ** - Hosting hizmetleri tab
 │   │   └── profile_tab.dart           # Profil tab
-│   ├── auth_screen.dart               # Giriş ve kayıt ekranı
+│   ├── auth_screen.dart               # Giriş ekranı
+│   ├── scrollable_register_screen.dart # Multi-step kayıt ekranı
 │   ├── cart_screen.dart               # Sepet ekranı (modal içerik)
-│   ├── favorites_screen.dart          # Favoriler ekranı (modal gibi ama normal sayfa şuanda)
+│   ├── favorites_screen.dart          # Favoriler ekranı
 │   ├── home_screen.dart               # Ana sayfa ekranı (AppBar + sepet ikonu)
-│   ├── main_screen.dart               # Ana ekran (3-tab navigation)
+│   ├── main_screen.dart               # Ana ekran (4-tab navigation) **GÜNCELLENDİ**
 │   ├── product_detail_screen.dart     # Ürün detay ekranı
 │   ├── product_list_screen.dart       # Ürün listesi ekranı (AppBar + sepet ikonu)
+│   ├── hosting_screen.dart            # **YENİ** - Hosting paketleri ekranı
 │   └── profile_screen.dart            # Profil ekranı
 ├── services/                          # API ve servis katmanı
-│   ├── auth_service.dart              # **GÜNCELLENDI** - Mock API entegrasyonu ile kimlik doğrulama
-│   ├── mock_api_service.dart          # **YENİ** - JSON Mock Server HTTP servisi
+│   ├── auth_service.dart              # Mock API entegrasyonu ile kimlik doğrulama
+│   ├── mock_api_service.dart          # JSON Mock Server HTTP servisi
 │   └── product_service.dart           # Ürün API servisi (XML parser)
 └── widgets/                           # Özel widget bileşenleri
     ├── cart_modal_widget.dart         # Reusable sepet modal widget
-    ├── custom_bottom_navbar.dart      # Özel bottom navigation (3-tab)
+    ├── custom_bottom_navbar.dart      # **GÜNCELLENDİ** - 4-tab navigation
     ├── flash_card_widget.dart         # Flash kart widget
     ├── product_card_v2.dart           # Kompakt ürün kartı (ana sayfa)
     ├── product_details_widgets/       # Ürün detay widget'ları
@@ -57,21 +60,40 @@ lib/
     │   ├── product_description_section.dart # Açıklama bölümü
     │   ├── product_detail_row.dart    # Detay satırları
     │   └── product_image_gallery.dart # Görsel galerisi
-    └── product_lists_widgets/         # Ürün listesi widget'ları
+    ├── product_lists_widgets/         # Ürün listesi widget'ları
     │   ├── category_selector_modal.dart # Kategori seçici modal
     │   ├── compact_search_widget.dart # Kompakt arama + kategori widget
     │   ├── error_widget.dart          # Hata widget'ı
     │   ├── loading_widget.dart        # Yükleme widget'ı
     │   ├── pagination_widget.dart     # Sayfalama widget'ı
-    │   ├── product_card.dart          # Ana ürün kartı (ürünler sayfası)
-    ├── auth_steps/
-    │   ├── step1_account_type.dart
-    │   ├── step2_personal_info.dart
-
-
-└── db.json                            # **YENİ** - JSON Mock Server veritabanı
+    │   └── product_card.dart          # Ana ürün kartı (ürünler sayfası)
+    └── auth_steps/
+        ├── step1_account_type.dart
+        └── step2_personal_info.dart
+└── assets/
+    └── data/
+        └── cities.json                 # Türkiye il/ilçe verileri
+└── db.json                            # JSON Mock Server veritabanı
 ```
 
+YENİ EKLENENLERİN ÖZETİ
+4-Tab Navigation Sistemi
+Uygulama artık 4 tab ile çalışmaktadır:
+
+Ana Sayfa (Home) - index 0
+Ürünler (Products) - index 1
+Hosting (Hosting) - index 2 [YENİ]
+Profil (Profile) - index 3
+
+Hosting Hizmetleri Modülü
+Yeni dosyalar:
+
+lib/screens/tabs/hosting_tab.dart - Tab navigation wrapper
+lib/screens/hosting_screen.dart - Ana hosting ekranı
+
+
+main_screen.dart: IndexedStack 4 tab'a çıkarıldı
+custom_bottom_navbar.dart: 4. hosting ikonu eklendi (dns_outlined/dns)
 
 
 ## **YENİ GÜNCELLENEN MİMARİ YAPISSI**
@@ -198,10 +220,12 @@ DELETE /favorites/1         # Favori sil
 - XML'den 158 ürünün çekilmesi, arama ve kategori filtreleme (değişiklik yok)
 - Sayfalama ile optimize edilmiş ürün listesi yönetimi (değişiklik yok)
 - Minimal sepet sistemi (ID-based storage, KDV hesaplaması) (değişiklik yok)
-- 3-tab responsive tasarım ve state preservation (değişiklik yok)
+- 4-tab responsive tasarım ve state preservation (değişiklik yok)
 - Reusable widget'lar ile tutarlı UI deneyimi (değişiklik yok)
+- Hosting paketlerinin listelenmesi ve mock sipariş ver(ya direk sipariş olacak ya da carta ekleyeceğiz)
 - Ürünlerin favori ikonuna tıklayarak favorileme
 - JSON Mock Server entegrasyonu ve gerçek HTTP authentication sistemi tamamlandı  , favoriler mantığı tamamlandı, uilar da tamamlandı
+
 
 ### Temel Akış
 
@@ -573,7 +597,7 @@ Kod değişikliği **minimum** düzeyde kalacaktır.
 
 ---
 
-**Son Güncelleme:** ProductDetailScreen sepet/favori işlemleri ve demo butonları düzeltmeleri tamamlandı  
-**Toplam Dosya Sayısı:** 35+ dart dosyası + assets + mock server configuration  
+**Son Güncelleme:** Hosting modülü tamamlandı - 4-tab navigation, gerçek paket verileri, interactive sipariş sistemi
+**Toplam Dosya Sayısı:** 37+ dart dosyası + assets + mock server configuration  
 **Ana Özellikler:** Real HTTP authentication, gelişmiş ürün detay sayfası, optimized cart system, responsive UI, production-ready backend simulation  
 **Mimari:** Clean Architecture + HTTP Services, Provider pattern, Widget-based modular design, Mock-to-Production transition ready
