@@ -705,18 +705,6 @@
   ],
   "favorites": [
     {
-      "id": 1,
-      "user_id": 1,
-      "script_id": 5,
-      "created_at": "2024-08-20T14:30:00Z"
-    },
-    {
-      "id": 2,
-      "user_id": 1,
-      "script_id": 12,
-      "created_at": "2024-08-21T09:15:00Z"
-    },
-    {
       "id": 3,
       "user_id": 2,
       "script_id": 1,

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/favorites_provider.dart';
+import '../models/hosting_cart_item.dart';
 import '../widgets/cart_modal_widget.dart';
 import '../screens/favorites_screen.dart';
 
@@ -17,11 +18,7 @@ class _HostingScreenState extends State<HostingScreen> {
   @override
   void initState() {
     super.initState();
-    // Hosting verilerini yükle (gelecekte provider ile)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // TODO: HostingProvider.loadHostingPlans();
-
-      // Login olan kullanıcı için favorileri yükle
       final userProvider = context.read<UserProvider>();
       if (userProvider.isLoggedIn && userProvider.currentUser != null) {
         context
@@ -59,7 +56,6 @@ class _HostingScreenState extends State<HostingScreen> {
           ),
         ),
         actions: [
-          // Sepet ikonu
           Consumer<CartProvider>(
             builder: (context, cartProvider, child) {
               return IconButton(
@@ -89,7 +85,7 @@ class _HostingScreenState extends State<HostingScreen> {
                             minHeight: 14,
                           ),
                           child: Text(
-                            '${cartProvider.itemCount}',
+                            '${cartProvider.totalItemCount}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 9,
@@ -105,7 +101,6 @@ class _HostingScreenState extends State<HostingScreen> {
             },
           ),
           const SizedBox(width: 8),
-          // Favoriler ikonu
           Consumer2<FavoritesProvider, UserProvider>(
             builder: (context, favoritesProvider, userProvider, child) {
               return IconButton(
@@ -163,8 +158,6 @@ class _HostingScreenState extends State<HostingScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-
-            // Hoş geldin bölümü
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Consumer<UserProvider>(
@@ -194,10 +187,7 @@ class _HostingScreenState extends State<HostingScreen> {
                 },
               ),
             ),
-
             const SizedBox(height: 24),
-
-            // Açıklama metni
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Text(
@@ -210,10 +200,7 @@ class _HostingScreenState extends State<HostingScreen> {
                 textAlign: TextAlign.center,
               ),
             ),
-
             const SizedBox(height: 32),
-
-            // Linux Web Hosting başlık
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Text(
@@ -226,10 +213,7 @@ class _HostingScreenState extends State<HostingScreen> {
                 textAlign: TextAlign.center,
               ),
             ),
-
             const SizedBox(height: 24),
-
-            // Hosting paketleri
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
@@ -279,7 +263,6 @@ class _HostingScreenState extends State<HostingScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 30),
           ],
         ),
@@ -394,8 +377,8 @@ class _HostingScreenState extends State<HostingScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: Text(
-                      'SATIN AL',
+                    child: const Text(
+                      'Sepete Ekle',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -517,11 +500,11 @@ class _HostingScreenState extends State<HostingScreen> {
                 onPressed: (domain.isNotEmpty && selectedYears != null)
                     ? () {
                         Navigator.of(context).pop();
-                        _proceedToPayment(packageId, packageName, domain,
+                        _addToCart(packageId, packageName, domain,
                             selectedYears!, totalPrice);
                       }
                     : null,
-                child: Text('Ödemeye Geç'),
+                child: Text('Sepete Ekle'),
               ),
             ],
           );
@@ -530,21 +513,35 @@ class _HostingScreenState extends State<HostingScreen> {
     );
   }
 
-  void _proceedToPayment(String packageId, String packageName, String domain,
+  void _addToCart(String packageId, String packageName, String domain,
       int years, int totalPrice) {
-    // TODO: Ödeme sayfasına yönlendirme
-    ScaffoldMessenger.of(context).showSnackBar(
+    final hostingItem = HostingCartItem(
+      packageId: packageId,
+      packageName: packageName,
+      domain: domain,
+      years: years,
+      basePrice: totalPrice ~/ years,
+      totalPrice: totalPrice,
+    );
+    context.read<CartProvider>().addHostingToCart(hostingItem);
+/**
+ * Carta eklendi snackbarı    
+ * 
+ *  ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Sipariş: $packageName\n'
-          'Domain: www.$domain.com\n'
-          'Süre: $years yıl\n'
-          'Toplam: ₺$totalPrice\n'
-          'Ödeme sistemi yakında eklenecek',
+          '${hostingItem.summary}\nSepete eklendi!',
         ),
         backgroundColor: Colors.green,
-        duration: Duration(seconds: 4),
+        duration: Duration(seconds: 2),
+        action: SnackBarAction(
+          label: 'Sepeti Gör',
+          textColor: Colors.white,
+          onPressed: () {
+            CartModalWidget.show(context);
+          },
+        ),
       ),
-    );
+    );*/
   }
 }

@@ -1,4 +1,4 @@
-// lib/screens/cart_screen.dart - Basitleştirilmiş
+// lib/screens/cart_screen.dart - Hosting desteği eklendi
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,37 +18,44 @@ class CartScreen extends StatelessWidget {
             return _buildEmptyCart(context);
           }
 
-          final cartProducts =
-              cartProvider.getCartProducts(productProvider.allProducts);
-          final subtotal =
-              cartProvider.getSubtotal(productProvider.allProducts);
-          final kdvAmount =
-              cartProvider.getKdvAmount(productProvider.allProducts);
-          final totalAmount =
-              cartProvider.getTotalAmount(productProvider.allProducts);
-
           return Column(
             children: [
-              // Sepet listesi
+              // Cart content
               Expanded(
-                child: ListView.builder(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
-                  itemCount: cartProducts.length,
-                  itemBuilder: (context, index) {
-                    final product = cartProducts[index];
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Script items section
+                      if (cartProvider.scriptItemCount > 0) ...[
+                        _buildSectionHeader(
+                          'Web Scriptleri (${cartProvider.scriptItemCount})',
+                          Icons.code,
+                        ),
+                        const SizedBox(height: 12),
+                        ..._buildScriptItems(
+                            context, cartProvider, productProvider),
+                        if (cartProvider.hostingItemCount > 0)
+                          const SizedBox(height: 20),
+                      ],
 
-                    return _buildCartItem(
-                      context,
-                      product,
-                      cartProvider,
-                    );
-                  },
+                      // Hosting items section
+                      if (cartProvider.hostingItemCount > 0) ...[
+                        _buildSectionHeader(
+                          'Hosting Hizmetleri (${cartProvider.hostingItemCount})',
+                          Icons.dns,
+                        ),
+                        const SizedBox(height: 12),
+                        ..._buildHostingItems(context, cartProvider),
+                      ],
+                    ],
+                  ),
                 ),
               ),
 
-              // Alt toplam bar
-              _buildTotalBar(
-                  context, subtotal, kdvAmount, totalAmount, cartProvider),
+              // Bottom bar
+              _buildTotalBar(context, cartProvider, productProvider),
             ],
           );
         },
@@ -84,7 +91,7 @@ class CartScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Henüz sepetinizde ürün bulunmuyor.\nAlışverişe başlamak için ürünler sekmesini ziyaret edin.',
+            'Henüz sepetinizde ürün bulunmuyor.\nAlışverişe başlamak için ürünler\nveya hosting sekmesini ziyaret edin.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
@@ -113,93 +120,235 @@ class CartScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCartItem(
-    BuildContext context,
-    dynamic product,
-    CartProvider cartProvider,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, color: const Color(0xFF667eea), size: 20),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[800],
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Ürün resmi
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: product.image.isNotEmpty
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      product.image,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.image, color: Colors.grey[400]);
-                      },
-                    ),
-                  )
-                : Icon(Icons.image, color: Colors.grey[400]),
-          ),
-          const SizedBox(width: 12),
-
-          // Ürün bilgileri
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${product.price.toStringAsFixed(0)} ${product.priceUnit}',
-                  style: TextStyle(
-                    color: Colors.blue[600],
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Çıkar butonu
-          IconButton(
-            onPressed: () => cartProvider.removeFromCart(product.id),
-            icon: Icon(
-              Icons.delete_outline,
-              color: Colors.red[600],
-            ),
-            tooltip: 'Sepetten Çıkar',
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildTotalBar(BuildContext context, double subtotal, double kdvAmount,
-      double totalAmount, CartProvider cartProvider) {
+  List<Widget> _buildScriptItems(
+    BuildContext context,
+    CartProvider cartProvider,
+    ProductProvider productProvider,
+  ) {
+    final cartProducts =
+        cartProvider.getCartProducts(productProvider.allProducts);
+
+    return cartProducts
+        .map((product) => Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Ürün resmi
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: product.image.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              product.image,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(Icons.code,
+                                    color: Colors.grey[400]);
+                              },
+                            ),
+                          )
+                        : Icon(Icons.code, color: Colors.grey[400]),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Ürün bilgileri
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Kod: ${product.code}',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${product.price.toStringAsFixed(0)}₺ + KDV',
+                          style: TextStyle(
+                            color: Colors.blue[600],
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Çıkar butonu
+                  IconButton(
+                    onPressed: () => cartProvider.removeFromCart(product.id),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      color: Colors.red[600],
+                    ),
+                    tooltip: 'Sepetten Çıkar',
+                  ),
+                ],
+              ),
+            ))
+        .toList();
+  }
+
+  List<Widget> _buildHostingItems(
+      BuildContext context, CartProvider cartProvider) {
+    return cartProvider.hostingItems
+        .map((hostingItem) => Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.blue[200]!),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Hosting icon
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF667eea),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.dns,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Hosting info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          hostingItem.packageName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          hostingItem.formattedDomain,
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Text(
+                              hostingItem.durationText,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(' • ',
+                                style: TextStyle(color: Colors.grey[400])),
+                            Text(
+                              '${hostingItem.totalPrice}₺ (KDV Dahil)',
+                              style: TextStyle(
+                                color: const Color(0xFF667eea),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Çıkar butonu
+                  IconButton(
+                    onPressed: () => cartProvider.removeHostingFromCart(
+                      hostingItem.packageId,
+                      hostingItem.domain,
+                    ),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      color: Colors.red[600],
+                    ),
+                    tooltip: 'Sepetten Çıkar',
+                  ),
+                ],
+              ),
+            ))
+        .toList();
+  }
+
+  Widget _buildTotalBar(
+    BuildContext context,
+    CartProvider cartProvider,
+    ProductProvider productProvider,
+  ) {
+    final scriptSubtotal =
+        cartProvider.getScriptSubtotal(productProvider.allProducts);
+    final scriptKdv =
+        cartProvider.getScriptKdvAmount(productProvider.allProducts);
+    final hostingTotal = cartProvider.getHostingTotalAmount();
+    final grandTotal = cartProvider.getGrandTotal(productProvider.allProducts);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -215,79 +364,93 @@ class CartScreen extends StatelessWidget {
       child: Column(
         children: [
           // Fiyat detayları
-          Column(
+          if (cartProvider.scriptItemCount > 0) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Scriptler (${cartProvider.scriptItemCount} adet):',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                Text(
+                  '${scriptSubtotal.toStringAsFixed(0)}₺',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'KDV (%20):',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                Text(
+                  '${scriptKdv.toStringAsFixed(0)}₺',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+            if (cartProvider.hostingItemCount > 0) const SizedBox(height: 4),
+          ],
+
+          if (cartProvider.hostingItemCount > 0) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Hosting (${cartProvider.hostingItemCount} adet):',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                Text(
+                  '${hostingTotal.toStringAsFixed(0)}₺ (KDV Dahil)',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ],
+
+          const SizedBox(height: 8),
+          Container(height: 1, color: Colors.grey[300]),
+          const SizedBox(height: 8),
+
+          // Genel toplam
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Ara toplam
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Ara Toplam (${cartProvider.itemCount} ürün):',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  Text(
-                    '${subtotal.toStringAsFixed(0)} TL',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+              const Text(
+                'Genel Toplam:',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              const SizedBox(height: 4),
-
-              // KDV
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'KDV (%20):',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  Text(
-                    '${kdvAmount.toStringAsFixed(0)} TL',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // Divider
-              Container(
-                height: 1,
-                color: Colors.grey[300],
-              ),
-              const SizedBox(height: 8),
-
-              // Genel toplam
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Genel Toplam:',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    '${totalAmount.toStringAsFixed(0)} TL',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue[600],
-                    ),
-                  ),
-                ],
+              Text(
+                '${grandTotal.toStringAsFixed(0)}₺',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[600],
+                ),
               ),
             ],
           ),
@@ -303,12 +466,12 @@ class CartScreen extends StatelessWidget {
                   onPressed: () {
                     _showClearCartDialog(context, cartProvider);
                   },
-                  child: const Text('Temizle'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red[600],
                     side: BorderSide(color: Colors.red[600]!),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
+                  child: const Text('Temizle'),
                 ),
               ),
               const SizedBox(width: 12),
@@ -319,12 +482,12 @@ class CartScreen extends StatelessWidget {
                   onPressed: () {
                     _showOrderDialog(context);
                   },
-                  child: const Text('Sipariş Ver'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue[600],
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
+                  child: const Text('Sipariş Ver'),
                 ),
               ),
             ],

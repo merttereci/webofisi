@@ -1,31 +1,41 @@
-// lib/providers/cart_provider.dart - Basitleştirilmiş versiyon
+// lib/providers/cart_provider.dart - Hosting desteği eklendi
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../models/hosting_cart_item.dart';
 
 class CartProvider extends ChangeNotifier {
-  Set<int> _cartItems = {}; // Set kullanarak sadece ID'leri tut
+  Set<int> _cartItems = {}; // Script ID'leri (mevcut sistem)
+  List<HostingCartItem> _hostingItems = []; // Hosting items (yeni)
   bool _isLoading = false;
 
-  // Getters
+  // Getters - Scripts (mevcut)
   Set<int> get cartItems => Set.unmodifiable(_cartItems);
   bool get isLoading => _isLoading;
-  int get itemCount => _cartItems.length; // Toplam farklı ürün sayısı
-  bool get isEmpty => _cartItems.isEmpty;
-  bool get isNotEmpty => _cartItems.isNotEmpty;
+  int get scriptItemCount => _cartItems.length;
+  bool get isEmpty => _cartItems.isEmpty && _hostingItems.isEmpty;
+  bool get isNotEmpty => _cartItems.isNotEmpty || _hostingItems.isNotEmpty;
+
+  // Getters - Hosting (yeni)
+  List<HostingCartItem> get hostingItems => List.unmodifiable(_hostingItems);
+  int get hostingItemCount => _hostingItems.length;
+
+  // Getters - Combined
+  int get totalItemCount => scriptItemCount + hostingItemCount;
+  int get itemCount => totalItemCount; // Compatibility için
 
   // Constructor
   CartProvider() {
     _loadCartFromStorage();
   }
 
-  // Ürün sepette var mı?
+  // ====== SCRIPT METHODS (Mevcut - Değişiklik Yok) ======
+
   bool isInCart(int productId) {
     return _cartItems.contains(productId);
   }
 
-  // Sepete ürün ekle (toggle mantığı)
   void toggleCart(int productId) {
     if (_cartItems.contains(productId)) {
       _cartItems.remove(productId);
@@ -39,7 +49,6 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Sepete ürün ekle (manuel)
   void addToCart(int productId) {
     if (!_cartItems.contains(productId)) {
       _cartItems.add(productId);
@@ -49,7 +58,6 @@ class CartProvider extends ChangeNotifier {
     }
   }
 
-  // Sepetten ürün çıkar
   void removeFromCart(int productId) {
     _cartItems.remove(productId);
     _saveCartToStorage();
@@ -57,15 +65,6 @@ class CartProvider extends ChangeNotifier {
     print('Sepetten çıkarıldı: ID $productId');
   }
 
-  // Sepeti temizle
-  void clearCart() {
-    _cartItems.clear();
-    _saveCartToStorage();
-    notifyListeners();
-    print('Sepet temizlendi');
-  }
-
-  // Sepetteki ürünleri Product listesi olarak al
   List<dynamic> getCartProducts(List<dynamic> allProducts) {
     return _cartItems
         .map((productId) {
@@ -80,32 +79,75 @@ class CartProvider extends ChangeNotifier {
         .toList();
   }
 
-  // Toplam tutarı hesapla (her ürün quantity=1) + %20 KDV
-  double getTotalAmount(List<dynamic> allProducts) {
-    double subtotal = 0;
-    for (var productId in _cartItems) {
-      try {
-        final product = allProducts.firstWhere((p) => p.id == productId);
-        subtotal += product.price; // Quantity yok, direkt fiyat ekle
-      } catch (e) {
-        print('Fiyat hesaplanamayan ürün ID: $productId');
-        continue;
-      }
-    }
+  // ====== HOSTING METHODS (Yeni) ======
 
-    // %20 KDV ekle
-    double kdv = subtotal * 0.20;
-    double total = subtotal + kdv;
-
-    print('Ara Toplam: ${subtotal.toStringAsFixed(2)} TL');
-    print('KDV (%20): ${kdv.toStringAsFixed(2)} TL');
-    print('Genel Toplam: ${total.toStringAsFixed(2)} TL');
-
-    return total;
+  bool isHostingInCart(String packageId, String domain) {
+    return _hostingItems
+        .any((item) => item.packageId == packageId && item.domain == domain);
   }
 
-  // Ara toplam (KDV hariç)
-  double getSubtotal(List<dynamic> allProducts) {
+  void addHostingToCart(HostingCartItem hostingItem) {
+    // Aynı paket + domain kombinasyonu varsa güncelle
+    final existingIndex = _hostingItems.indexWhere((item) =>
+        item.packageId == hostingItem.packageId &&
+        item.domain == hostingItem.domain);
+
+    if (existingIndex != -1) {
+      _hostingItems[existingIndex] = hostingItem;
+      print('Hosting güncellendi: ${hostingItem.summary}');
+    } else {
+      _hostingItems.add(hostingItem);
+      print('Hosting sepete eklendi: ${hostingItem.summary}');
+    }
+
+    _saveCartToStorage();
+    notifyListeners();
+  }
+
+  void removeHostingFromCart(String packageId, String domain) {
+    _hostingItems.removeWhere(
+        (item) => item.packageId == packageId && item.domain == domain);
+
+    _saveCartToStorage();
+    notifyListeners();
+    print('Hosting sepetten çıkarıldı: $packageId - $domain');
+  }
+
+  void removeHostingById(String uniqueId) {
+    _hostingItems.removeWhere((item) => item.uniqueId == uniqueId);
+    _saveCartToStorage();
+    notifyListeners();
+    print('Hosting sepetten çıkarıldı: $uniqueId');
+  }
+
+  // ====== COMBINED METHODS ======
+
+  void clearCart() {
+    _cartItems.clear();
+    _hostingItems.clear();
+    _saveCartToStorage();
+    notifyListeners();
+    print('Sepet tamamen temizlendi');
+  }
+
+  void clearScriptCart() {
+    _cartItems.clear();
+    _saveCartToStorage();
+    notifyListeners();
+    print('Script sepeti temizlendi');
+  }
+
+  void clearHostingCart() {
+    _hostingItems.clear();
+    _saveCartToStorage();
+    notifyListeners();
+    print('Hosting sepeti temizlendi');
+  }
+
+  // ====== PRICE CALCULATION METHODS ======
+
+  // Scripts toplam (mevcut sistem - KDV hariç)
+  double getScriptSubtotal(List<dynamic> allProducts) {
     double subtotal = 0;
     for (var productId in _cartItems) {
       try {
@@ -118,42 +160,104 @@ class CartProvider extends ChangeNotifier {
     return subtotal;
   }
 
-  // KDV tutarı
-  double getKdvAmount(List<dynamic> allProducts) {
-    return getSubtotal(allProducts) * 0.20;
+  // Scripts KDV tutarı
+  double getScriptKdvAmount(List<dynamic> allProducts) {
+    return getScriptSubtotal(allProducts) * 0.20;
   }
 
-  // SharedPreferences'a kaydet
+  // Scripts toplam (KDV dahil)
+  double getScriptTotalAmount(List<dynamic> allProducts) {
+    double subtotal = getScriptSubtotal(allProducts);
+    return subtotal + (subtotal * 0.20);
+  }
+
+  // Hosting toplam (KDV zaten dahil)
+  double getHostingTotalAmount() {
+    return _hostingItems.fold(0.0, (sum, item) => sum + item.totalPrice);
+  }
+
+  // Genel toplam (Scripts + Hosting)
+  double getGrandTotal(List<dynamic> allProducts) {
+    double scriptTotal = getScriptTotalAmount(allProducts);
+    double hostingTotal = getHostingTotalAmount();
+    return scriptTotal + hostingTotal;
+  }
+
+  // Backward compatibility için eski metodlar
+  double getSubtotal(List<dynamic> allProducts) {
+    return getScriptSubtotal(allProducts);
+  }
+
+  double getKdvAmount(List<dynamic> allProducts) {
+    return getScriptKdvAmount(allProducts);
+  }
+
+  double getTotalAmount(List<dynamic> allProducts) {
+    return getGrandTotal(allProducts);
+  }
+
+  // ====== STORAGE METHODS ======
+
   Future<void> _saveCartToStorage() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final cartList = _cartItems.toList(); // Set'i List'e çevir
-      await prefs.setString('cart_items', json.encode(cartList));
+
+      // Scripts kaydet (mevcut sistem)
+      final scriptList = _cartItems.toList();
+      await prefs.setString('cart_items', json.encode(scriptList));
+
+      // Hosting kaydet (yeni)
+      final hostingList = _hostingItems.map((item) => item.toJson()).toList();
+      await prefs.setString('hosting_items', json.encode(hostingList));
     } catch (e) {
       print('Sepet kaydedilemedi: $e');
     }
   }
 
-  // SharedPreferences'tan yükle
   Future<void> _loadCartFromStorage() async {
     _isLoading = true;
     notifyListeners();
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final cartString = prefs.getString('cart_items');
 
+      // Scripts yükle (mevcut sistem)
+      final cartString = prefs.getString('cart_items');
       if (cartString != null) {
         final cartList = List<int>.from(json.decode(cartString));
-        _cartItems = cartList.toSet(); // List'i Set'e çevir
-        print('Sepet yüklendi: ${_cartItems.length} ürün');
+        _cartItems = cartList.toSet();
       }
+
+      // Hosting yükle (yeni)
+      final hostingString = prefs.getString('hosting_items');
+      if (hostingString != null) {
+        final hostingList =
+            List<Map<String, dynamic>>.from(json.decode(hostingString));
+        _hostingItems =
+            hostingList.map((item) => HostingCartItem.fromJson(item)).toList();
+      }
+
+      print(
+          'Sepet yüklendi: ${_cartItems.length} script, ${_hostingItems.length} hosting');
     } catch (e) {
       print('Sepet yüklenemedi: $e');
       _cartItems = {};
+      _hostingItems = [];
     }
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  // ====== DEBUG METHODS ======
+
+  void printCartContents() {
+    print('=== SEPET İÇERİK ===');
+    print('Scripts: $_cartItems');
+    print('Hosting items: ${_hostingItems.length}');
+    for (var item in _hostingItems) {
+      print('  - ${item.summary} (${item.totalPrice}₺)');
+    }
+    print('==================');
   }
 }

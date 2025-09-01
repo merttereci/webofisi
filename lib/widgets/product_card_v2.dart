@@ -40,11 +40,15 @@ class ProductCardV2 extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isFavorite
-                ? '${product.name} favorilere eklendi'
-                : '${product.name} favorilerden çıkarıldı',
-          ),
-          backgroundColor: isFavorite ? Colors.green : Colors.orange,
+              isFavorite
+                  ? '${product.name} favorilere eklendi'
+                  : '${product.name} favorilerden çıkarıldı',
+              style: const TextStyle(fontWeight: FontWeight.w500)),
+          backgroundColor: isFavorite ? Colors.red[400] : Colors.green[400],
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(16),
           duration: const Duration(seconds: 2),
         ),
       );
