@@ -33,32 +33,39 @@ class CustomBottomNavbar extends StatelessWidget {
         unselectedItemColor: Colors.grey[600],
         selectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.w600,
-          fontSize: 12,
+          fontSize: 11, // 12'den 11'e düşürüldü (5 tab için)
         ),
         unselectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.w500,
-          fontSize: 11,
+          fontSize: 10, // 11'den 10'a düşürüldü
         ),
         elevation: 0, // shadow'u container'da hallediyoruz
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined,
+                size: 22), // icon boyutları küçültüldü
+            activeIcon: Icon(Icons.home, size: 22),
             label: 'Ana Sayfa',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.grid_view_outlined),
-            activeIcon: Icon(Icons.grid_view),
+            icon: Icon(Icons.grid_view_outlined, size: 22),
+            activeIcon: Icon(Icons.grid_view, size: 22),
             label: 'Ürünler',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.dns_outlined),
-            activeIcon: Icon(Icons.dns),
+            icon: Icon(Icons.dns_outlined, size: 22),
+            activeIcon: Icon(Icons.dns, size: 22),
             label: 'Hosting',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
+            icon: Icon(Icons.support_agent_outlined,
+                size: 22), // YENİ: Destek tab'ı
+            activeIcon: Icon(Icons.support_agent, size: 22),
+            label: 'Destek',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline, size: 22),
+            activeIcon: Icon(Icons.person, size: 22),
             label: 'Profil',
           ),
         ],

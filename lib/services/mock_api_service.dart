@@ -279,7 +279,7 @@ class MockApiService {
       ticketData['updated_at'] = DateTime.now().toIso8601String();
 
       final response = await http.post(
-        Uri.parse('$baseUrl/support_tickets'),
+        Uri.parse('$baseUrl/destek'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(ticketData),
       );

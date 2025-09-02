@@ -35,6 +35,8 @@ dependencies:
   provider: ^6.0.5
   url_launcher: ^6.1.10
   shared_preferences: ^2.2.2
+  image_picker: ^1.0.4
+  permission_handler: ^10.4.5   # Runtime permission kontrolü
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -74,6 +76,7 @@ flutter:
     - assets/logo/logo.png
     - assets/launcher/icon.png
     - assets/data/cities.json
+    - assets/data/faq_data.json
    
 
 

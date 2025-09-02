@@ -10,7 +10,8 @@ Web Ofisi Mobile, kurumsal web yazılımları satışı için geliştirilmiş mo
 ```
 assets/
 ├──data/   
-   └── cities.json                 # Türkiye il/ilçe verileri
+   ├── cities.json                 # Türkiye il/ilçe verileri
+   └── faq_data.json              # **YENİ** - Sık sorulan sorular verisi
 ├──launcher/
    └── icon.png
 ├──logo/
@@ -32,7 +33,9 @@ lib/
 │   │   └── uyeler.dart                # Üyeler modeli
 │   ├── product.dart                   # Ana ürün modeli (XML verisi)
 │   ├── hosting_cart_item.dart         
-│   └── register_form_data.dart
+│   ├── register_form_data.dart
+│   ├── faq_item.dart                  # **YENİ** - FAQ modeli
+│   └── support_ticket_form_data.dart  # **YENİ** - Destek talebi form modeli
 ├── providers/                         # State Management (Provider)
 │   ├── cart_provider.dart             # Sepet state yönetimi (minimal ID-based)
 │   ├── product_provider.dart          # Ürün state yönetimi
@@ -42,25 +45,28 @@ lib/
 │   ├── tabs/                          # Tab ekranları
 │   │   ├── home_tab.dart              # Ana sayfa tab
 │   │   ├── products_tab.dart          # Ürünler tab
-│   │   ├── hosting_tab.dart           # **YENİ** - Hosting hizmetleri tab
+│   │   ├── hosting_tab.dart           # Hosting hizmetleri tab
+│   │   ├── support_tab.dart           # **YENİ** - Destek tab
 │   │   └── profile_tab.dart           # Profil tab
 │   ├── auth_screen.dart               # Giriş ekranı
 │   ├── scrollable_register_screen.dart # Multi-step kayıt ekranı
 │   ├── cart_screen.dart               # Sepet ekranı (modal içerik)
 │   ├── favorites_screen.dart          # Favoriler ekranı
 │   ├── home_screen.dart               # Ana sayfa ekranı (AppBar + sepet ikonu)
-│   ├── main_screen.dart               # Ana ekran (4-tab navigation) **GÜNCELLENDİ**
+│   ├── main_screen.dart               # Ana ekran (5-tab navigation) **GÜNCELLENDİ**
 │   ├── product_detail_screen.dart     # Ürün detay ekranı
 │   ├── product_list_screen.dart       # Ürün listesi ekranı (AppBar + sepet ikonu)
-│   ├── hosting_screen.dart            # **YENİ** - Hosting paketleri ekranı
+│   ├── hosting_screen.dart            # Hosting paketleri ekranı
+│   ├── support_screen.dart            # **YENİ** - Destek sistemi ana ekranı
 │   └── profile_screen.dart            # Profil ekranı
 ├── services/                          # API ve servis katmanı
 │   ├── auth_service.dart              # Mock API entegrasyonu ile kimlik doğrulama
 │   ├── mock_api_service.dart          # JSON Mock Server HTTP servisi
-│   └── product_service.dart           # Ürün API servisi (XML parser)
+│   ├── product_service.dart           # Ürün API servisi (XML parser)
+│   └── faq_service.dart               # **YENİ** - FAQ veri servisi
 └── widgets/                           # Özel widget bileşenleri
     ├── cart_modal_widget.dart         # Reusable sepet modal widget
-    ├── custom_bottom_navbar.dart      # **GÜNCELLENDİ** - 4-tab navigation
+    ├── custom_bottom_navbar.dart      # **GÜNCELLENDİ** - 5-tab navigation
     ├── flash_card_widget.dart         # Flash kart widget
     ├── product_card_v2.dart           # Kompakt ürün kartı (ana sayfa)
     ├── product_details_widgets/       # Ürün detay widget'ları
@@ -80,6 +86,24 @@ db.json                            # JSON Mock Server veritabanı
 
 ## Mevcut Özellikler
 
+### **YENİ - Kapsamlı Destek Sistemi**
+- **FAQ Sistemi**: 11 adet detaylı sık sorulan soru
+- **ExpansionTile Interface**: Accordion-style açılabilir sorular
+- **YouTube Entegrasyonu**: Video tutorial linkleri
+- **Download Linkleri**: Ek dosya ve araç indirmeleri
+- **Destek Talebi Formu**: Kullanıcı bilgileri otomatik doldurma
+- **Multi-field Form**: Departman, öncelik, hizmet seçimi
+- **Image Upload**: Kamera/galeri ile fotoğraf ekleme
+- **Form Validation**: Comprehensive input kontrolü
+- **Complete Form Submission**: MockApiService entegrasyonu ile db.json'a veri yazma
+
+### **YENİ - Gelişmiş Navigation Sistemi**
+- **5-Tab Bottom Navigation**: Ana Sayfa, Ürünler, Hosting, Destek, Profil
+- **3-Tab Destek Sistemi**: S.S.S, Yeni Talep, Geçmiş Talepler
+- **State Preservation**: Tab değişimlerinde veri korunması
+- **Responsive Design**: Tüm ekran boyutlarında optimize edilmiş
+
+
 ### **YENİ - Gerçek Backend Deneyimi**
 - **Gerçek HTTP Authentication**: MockApiService ile login/register
 - **Database-like operations**: CRUD işlemleri JSON Mock Server üzerinde
@@ -98,11 +122,14 @@ db.json                            # JSON Mock Server veritabanı
 - XML'den 158 ürünün çekilmesi, arama ve kategori filtreleme (değişiklik yok)
 - Sayfalama ile optimize edilmiş ürün listesi yönetimi (değişiklik yok)
 - Minimal sepet sistemi (ID-based storage, KDV hesaplaması) 
-- 4-tab responsive tasarım ve state preservation 
+- 5-tab responsive tasarım ve state preservation 
 - Reusable widget'lar ile tutarlı UI deneyimi (değişiklik yok)
 - Hosting paketlerinin listelenmesi ve carta ekleme
 - Ürünlerin favori ikonuna tıklayarak favorileme
 - JSON Mock Server entegrasyonu ve gerçek HTTP authentication sistemi tamamlandı  , favoriler mantığı tamamlandı, uilar da tamamlandı
+- Hosting paketlerinin listelenmesi ve carta ekleme
+- Ürünlerin favori ikonuna tıklayarak favorileme
+- **Tam işlevsel destek sistemi**  FAQ + form + image upload + database persistence ile
 
 
 ### Temel Akış
@@ -112,6 +139,7 @@ db.json                            # JSON Mock Server veritabanı
 - Ürünler sayfası: Tüm ürünler, arama, kategori filtreleme, sayfalama
 - Favoriler: Login gerekli, Mock API ile gerçek HTTP CRUD
 - Sepet: Sayfa olarak açılır, KDV hesaplama, ürün toggle
+- **Destek**: FAQ browsing + destek talebi oluşturma + ticket tracking
 
 ### **Favoriler Sistemi Altyapısı 
 Mock API Server'da favorites tablosu mevcut ve MockApiService'te endpoint'ler hazır:
@@ -193,6 +221,11 @@ Production-ready bir backend deneyimi sağlamak için **json-server** kullanılm
 ### **MockApiService (lib/services/mock_api_service.dart)**
 JSON Mock Server ile iletişimi sağlayan kapsamlı HTTP servisi:
 
+**Destek İşlemleri:**
+- `createSupportTicket(ticketData)` - Yeni destek talebi (calısıyo)
+- `getUserTickets(userId)` - Kullanıcının talepleri (yapılacak)
+- `updateTicketStatus(ticketId, status)` - Talep durumu güncelleme (yapılacak)
+
 **Kullanıcı İşlemleri:**
 - `loginUser(email, password)` - Kullanıcı girişi
 - `registerUser(userData)` - Yeni kullanıcı kaydı
@@ -207,6 +240,12 @@ JSON Mock Server ile iletişimi sağlayan kapsamlı HTTP servisi:
 - `getUserFavorites(userId)` - Kullanıcının favorileri
 - `addToFavorites(userId, scriptId)` - Favori ekle
 - `removeFromFavorites(userId, scriptId)` - Favori sil
+
+### **FaqService (lib/services/faq_service.dart)**
+Asset tabanlı FAQ veri yönetimi:
+- `loadFaqItems()` - FAQ verilerini asset'ten yükleme
+- `searchFaqItems()` - FAQ arama fonksiyonu
+- Error handling ve type-safe data parsing
 
 
 ### **Güncellenmiş AuthService (lib/services/auth_service.dart)**
@@ -290,11 +329,10 @@ static const String baseUrl = 'https://yourdomain.com/api';
 
 Kod değişikliği **minimum** düzeyde kalacaktır.
 
-
-**Son Güncelleme:** Hosting modülü tamamlandı - 4-tab navigation, gerçek paket verileri, interactive sipariş sistemi
-**Toplam Dosya Sayısı:** 37+ dart dosyası + assets + mock server configuration  
-**Ana Özellikler:** Real HTTP authentication, gelişmiş ürün detay sayfası, optimized cart system, responsive UI, production-ready backend simulation  
-**Mimari:** Clean Architecture + HTTP Services, Provider pattern, Widget-based modular design, Mock-to-Production transition ready
+**Son Güncelleme:** Destek sistemi form submission tamamlandı - FAQ, working form + API integration, - 3-tab navigation"
+**Toplam Dosya Sayısı:** 40+ dart dosyası + assets + mock server configuration  
+**Ana Özellikler:** **Real HTTP authentication**, **comprehensive support system**, ürün browsing, optimized cart system, responsive UI, **production-ready backend simulation**  
+**Mimari:** **Clean Architecture + HTTP Services**, Provider pattern, Widget-based modular design, **Mock-to-Production transition ready**
 
 
 
@@ -306,4 +344,32 @@ Kod değişikliği **minimum** düzeyde kalacaktır.
 - Advanced analytics ve user behavior tracking
 - Progressive web app desteği: Mevcut HTTP infrastructure ile uyumlu
 
+Image Upload Mevcut Durumu:
+Çalışan Kısımlar:
+
+ + Kamera/galeri seçimi modal'ı
+ + Image picker fonksiyonu
+ + Seçilen resmin thumbnail preview'ı
+ + Resmi form'dan kaldırma
+ + Image compression (maxWidth: 1024, quality: 80)
+
+Çalışmayan/Eksik Kısımlar:
+
+ - Resmin gerçek verisi veritabanına kaydedilmiyor
+ - Sadece "Fotoğraf eklendi" text'i yazılıyor
+ - Base64 encoding yapılmıyor
+ - File storage/retrieval sistemi yok
 ---
+
+
+Nerede Kaldık?
+
+imageda base64 denenicek (low priority)
+support ticket gönderildikten sonra form temizlenip sayfa başına scroll edilsin
+geçmiş sonraya
+
+öncesinde
+sipariş verme tabloya yazma aktif edilecek, ödeme adımı atlanarak oraya onay gibi bir adım koyup şimdilik onaylanmış gibi düşünücez
+sipariş aktif olunca, support ticketta kullanıcı idye göre sipariş seçebilme seçeneği
+
+...

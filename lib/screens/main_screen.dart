@@ -6,6 +6,7 @@ import 'tabs/home_tab.dart';
 import 'tabs/products_tab.dart';
 import 'tabs/profile_tab.dart';
 import 'tabs/hosting_tab.dart';
+import 'tabs/support_tab.dart'; // YENİ IMPORT
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -42,8 +43,9 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           HomeTab(onTabChange: _changeTab),
           ProductsTab(onShowCategoryModal: _showCategoryModal),
-          const HostingTab(), // YENI EKLENEN
-          const ProfileTab(), // sepet tab'ı kaldırıldı
+          const HostingTab(),
+          const SupportTab(), // YENİ: Destek tab'ı
+          const ProfileTab(), // index 4'e kaydı
         ],
       ),
       // custom bottom navbar widget
